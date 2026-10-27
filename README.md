@@ -38,6 +38,8 @@ git push -u origin main
 
 ## ☁️ Cấu hình Supabase (Tài khoản thầy cô & Lưu lớp)
 
+> ✅ **Đã cấu hình sẵn** với project Supabase `game-ufo` (ref `ffsfrklbyoadxqzimeaj`, Singapore): bảng `classes` + RLS đã tạo, đã tắt xác nhận email để đăng ký dùng ngay, khóa anon đã điền trong `supabase-config.js`. Các bước dưới đây chỉ cần khi muốn dựng lại trên project khác.
+
 Không cấu hình thì game vẫn chạy bình thường và chỉ lưu trên máy. Muốn thầy cô đăng ký tài khoản để lưu lớp, làm 4 bước (khoảng 5 phút):
 
 1. **Tạo project** miễn phí tại [supabase.com/dashboard](https://supabase.com/dashboard) → **New project**.

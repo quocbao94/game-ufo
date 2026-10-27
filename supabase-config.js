@@ -6,6 +6,6 @@
 // Row Level Security (xem supabase/schema.sql). TUYỆT ĐỐI không dán service_role / secret key vào đây.
 // Để trống thì game vẫn chạy bình thường, chỉ lưu danh sách trên máy (localStorage).
 window.UFO_SUPABASE_CONFIG = {
-  url: '',
-  anonKey: ''
+  url: 'https://ffsfrklbyoadxqzimeaj.supabase.co',
+  anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZmc2Zya2xieW9hZHhxemltZWFqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMwOTk2MDAsImV4cCI6MjEwODY3NTYwMH0.KX6U-o8OF4WcpPc-x5B6y1u062YFFDZ18I09MW6JcgQ'
 };
