@@ -11,6 +11,8 @@
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%9B%B8%3C/text%3E%3C/svg%3E" />
   <title>UFO ơi! Đừng bắt em! — Mini-game Gọi Tên Học Sinh Lên Bảng</title>
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="supabase-config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
@@ -309,6 +311,60 @@
 
         <!-- Drawer Body (Scrollable) -->
         <div class="flex-1 overflow-y-auto p-4 space-y-5">
+
+          <!-- 0. Teacher Cloud Account (Supabase) — only shown when supabase-config.js is filled in -->
+          <div id="cloudPanel" class="hidden bg-violet-50/90 border-2 border-violet-200 rounded-2xl p-3.5 space-y-2.5">
+            <div class="flex items-center justify-between gap-2">
+              <h3 class="font-display font-extrabold text-sm text-slate-800 flex items-center gap-1.5">
+                <span>☁️</span>
+                <span>Tài khoản thầy cô</span>
+              </h3>
+              <span id="cloudUserEmail" class="text-[11px] font-bold text-violet-700 truncate max-w-[60%]"></span>
+            </div>
+
+            <!-- Logged out: quick email + password sign in / sign up -->
+            <form id="cloudAuthForm" class="space-y-2">
+              <input id="cloudEmail" type="email" autocomplete="email" required placeholder="Email của thầy cô" class="w-full rounded-xl border-2 border-violet-200 focus:border-violet-500 px-3 py-2 text-xs sm:text-sm font-bold text-slate-800 outline-none bg-white" />
+              <input id="cloudPassword" type="password" autocomplete="current-password" required minlength="6" placeholder="Mật khẩu (ít nhất 6 ký tự)" class="w-full rounded-xl border-2 border-violet-200 focus:border-violet-500 px-3 py-2 text-xs sm:text-sm font-bold text-slate-800 outline-none bg-white" />
+              <div class="flex items-center gap-2">
+                <button id="btnCloudSignIn" type="submit" class="btn-cartoon flex-1 py-2 px-3 rounded-xl bg-violet-600 hover:bg-violet-500 text-white font-extrabold text-xs sm:text-sm">
+                  Đăng nhập
+                </button>
+                <button id="btnCloudSignUp" type="button" class="btn-cartoon flex-1 py-2 px-3 rounded-xl bg-white hover:bg-violet-100 text-violet-800 font-extrabold text-xs sm:text-sm border-2 border-violet-300">
+                  ✨ Đăng ký nhanh
+                </button>
+              </div>
+              <p class="text-[11px] text-slate-600 font-semibold leading-relaxed">
+                Chỉ cần email + mật khẩu để lưu các lớp của thầy cô lên mây, dùng lại trên mọi máy.
+              </p>
+            </form>
+
+            <!-- Logged in: manage saved classes -->
+            <div id="cloudClassBox" class="hidden space-y-2">
+              <div class="flex items-center gap-2">
+                <select id="selectCloudClass" class="flex-1 min-w-0 rounded-xl border-2 border-violet-200 px-2 py-2 text-xs sm:text-sm font-extrabold text-slate-800 bg-white outline-none cursor-pointer" title="Chọn lớp đã lưu">
+                  <option value="">➕ Lớp mới (chưa lưu)</option>
+                </select>
+                <button id="btnCloudSignOut" type="button" class="py-2 px-2.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 font-extrabold text-[11px] shrink-0" title="Đăng xuất">
+                  Đăng xuất
+                </button>
+              </div>
+              <input id="cloudClassName" type="text" maxlength="80" placeholder="Tên lớp, ví dụ: 5A1 - Toán" class="w-full rounded-xl border-2 border-violet-200 focus:border-violet-500 px-3 py-2 text-xs sm:text-sm font-bold text-slate-800 outline-none bg-white" />
+              <div class="flex items-center gap-2">
+                <button id="btnCloudSaveClass" type="button" class="btn-cartoon flex-1 py-2 px-3 rounded-xl bg-violet-600 hover:bg-violet-500 text-white font-extrabold text-xs sm:text-sm">
+                  ☁️ Lưu lớp lên mây
+                </button>
+                <button id="btnCloudDeleteClass" type="button" class="py-2 px-3 rounded-xl bg-rose-100 hover:bg-rose-200 text-rose-700 font-extrabold text-xs border border-rose-300" title="Xóa lớp đang chọn">
+                  🗑️
+                </button>
+              </div>
+              <p class="text-[11px] text-slate-600 font-semibold leading-relaxed">
+                Lưu lớp sẽ lấy danh sách học sinh bên dưới. Khi đang mở một lớp đã lưu, lịch sử gọi tên được tự động đồng bộ.
+              </p>
+            </div>
+
+            <p id="cloudMsg" class="hidden text-[11px] font-bold"></p>
+          </div>
 
           <!-- 1. Selection Rules -->
           <div class="bg-amber-50/90 border-2 border-amber-200 rounded-2xl p-3.5 space-y-2.5">
@@ -3717,6 +3773,7 @@
           localStorage.setItem(STORAGE_KEY_NOREPEAT, String(noRepeatMode));
           localStorage.setItem(STORAGE_KEY_THEME, currentYardTheme);
         } catch (err) {}
+        scheduleCloudSync();
       }
 
       function updateTopCountersUI() {
@@ -3761,6 +3818,274 @@
           .replace(/</g, '&lt;')
           .replace(/>/g, '&gt;')
           .replace(/"/g, '&quot;');
+      }
+
+      function applyStudentListFromTextarea() {
+        const raw = document.getElementById('txtStudentList').value || '';
+        const cleaned = raw.split(/\r?\n/).map((s) => s.trim()).filter(Boolean);
+        if (cleaned.length === 0) return false;
+        allStudentNames = cleaned;
+        // Remove any called names no longer in list
+        calledStudentNames = calledStudentNames.filter((n) => allStudentNames.includes(n));
+        saveStateToStorage();
+        rebuildSchoolyardEntities();
+        renderCalledHistoryList();
+        return true;
+      }
+
+      // =========================================================================
+      // 7b. SUPABASE CLOUD — TEACHER ACCOUNTS & SAVED CLASSES
+      // Optional: only active when supabase-config.js has url + anonKey.
+      // =========================================================================
+      const STORAGE_KEY_CLOUD_CLASS = 'ufo_game_cloud_class_v1';
+      let supa = null;
+      let cloudUser = null;
+      let cloudClasses = [];
+      let activeCloudClassId = null;
+      let cloudSyncTimer = 0;
+      let suppressCloudSync = false;
+
+      function initCloud() {
+        const cfg = window.UFO_SUPABASE_CONFIG || {};
+        if (!cfg.url || !cfg.anonKey || !window.supabase || !window.supabase.createClient) return;
+        try {
+          supa = window.supabase.createClient(cfg.url, cfg.anonKey);
+        } catch (err) {
+          return;
+        }
+        try {
+          activeCloudClassId = localStorage.getItem(STORAGE_KEY_CLOUD_CLASS) || null;
+        } catch (err) {}
+        document.getElementById('cloudPanel').classList.remove('hidden');
+        bindCloudEvents();
+        // Defer work out of the auth callback (supabase-js recommends not awaiting other calls inside it)
+        supa.auth.onAuthStateChange((_event, session) => {
+          setTimeout(() => handleCloudSession(session), 0);
+        });
+      }
+
+      function showCloudMsg(text, isError) {
+        const el = document.getElementById('cloudMsg');
+        el.textContent = text;
+        el.classList.remove('hidden', 'text-emerald-600', 'text-rose-600');
+        el.classList.add(isError ? 'text-rose-600' : 'text-emerald-600');
+        clearTimeout(showCloudMsg.timer);
+        showCloudMsg.timer = setTimeout(() => el.classList.add('hidden'), isError ? 6000 : 3500);
+      }
+
+      function translateCloudError(err) {
+        const msg = (err && err.message) || String(err || '');
+        if (/invalid login credentials/i.test(msg)) return 'Sai email hoặc mật khẩu.';
+        if (/already registered|already been registered/i.test(msg)) return 'Email này đã có tài khoản, thầy cô bấm "Đăng nhập" nhé.';
+        if (/email not confirmed/i.test(msg)) return 'Email chưa được xác nhận. Thầy cô mở hộp thư để bấm link xác nhận.';
+        if (/password/i.test(msg) && /6/.test(msg)) return 'Mật khẩu cần ít nhất 6 ký tự.';
+        if (/failed to fetch|network/i.test(msg)) return 'Không kết nối được máy chủ. Kiểm tra mạng Internet.';
+        return msg || 'Có lỗi xảy ra, thử lại sau nhé.';
+      }
+
+      function setActiveCloudClass(id) {
+        activeCloudClassId = id || null;
+        try {
+          if (activeCloudClassId) localStorage.setItem(STORAGE_KEY_CLOUD_CLASS, activeCloudClassId);
+          else localStorage.removeItem(STORAGE_KEY_CLOUD_CLASS);
+        } catch (err) {}
+      }
+
+      function renderCloudPanel() {
+        const loggedIn = !!cloudUser;
+        document.getElementById('cloudAuthForm').classList.toggle('hidden', loggedIn);
+        document.getElementById('cloudClassBox').classList.toggle('hidden', !loggedIn);
+        document.getElementById('cloudUserEmail').textContent = loggedIn ? cloudUser.email || '' : '';
+        if (!loggedIn) return;
+
+        const sel = document.getElementById('selectCloudClass');
+        sel.innerHTML = '<option value="">➕ Lớp mới (chưa lưu)</option>' + cloudClasses.map((c) =>
+          `<option value="${escapeHtml(c.id)}">🏫 ${escapeHtml(c.name)} (${Array.isArray(c.students) ? c.students.length : 0})</option>`
+        ).join('');
+        sel.value = activeCloudClassId && cloudClasses.some((c) => c.id === activeCloudClassId) ? activeCloudClassId : '';
+        const active = cloudClasses.find((c) => c.id === activeCloudClassId);
+        document.getElementById('cloudClassName').value = active ? active.name : '';
+        document.getElementById('btnCloudDeleteClass').disabled = !active;
+        document.getElementById('btnCloudDeleteClass').classList.toggle('opacity-40', !active);
+      }
+
+      async function handleCloudSession(session) {
+        const user = (session && session.user) || null;
+        if ((user && user.id) === (cloudUser && cloudUser.id)) return; // token refresh, nothing changed
+        cloudUser = user;
+        cloudClasses = [];
+        renderCloudPanel();
+        if (!cloudUser) return;
+        await fetchCloudClasses();
+        const active = cloudClasses.find((c) => c.id === activeCloudClassId);
+        if (active) {
+          applyCloudClass(active);
+        } else {
+          setActiveCloudClass(null);
+          renderCloudPanel();
+        }
+      }
+
+      async function fetchCloudClasses() {
+        if (!supa || !cloudUser) return;
+        const { data, error } = await supa
+          .from('classes')
+          .select('id, name, students, called, updated_at')
+          .order('name', { ascending: true });
+        if (error) {
+          showCloudMsg(translateCloudError(error), true);
+          return;
+        }
+        cloudClasses = data || [];
+        renderCloudPanel();
+      }
+
+      function applyCloudClass(cls) {
+        if (gameState === 'CHASING' || gameState === 'ABDUCTING') {
+          showCloudMsg('UFO đang bắt học sinh, đợi xong lượt rồi đổi lớp nhé!', true);
+          renderCloudPanel();
+          return;
+        }
+        const students = (Array.isArray(cls.students) ? cls.students : []).map((n) => String(n).trim()).filter(Boolean);
+        setActiveCloudClass(cls.id);
+        if (students.length > 0) {
+          allStudentNames = students;
+          calledStudentNames = (Array.isArray(cls.called) ? cls.called : []).filter((n) => students.includes(n));
+          chosenStudent = null;
+          ufo.capturedStudent = null;
+          gameState = 'IDLE';
+          document.getElementById('winnerOverlay').classList.add('hidden');
+          document.getElementById('txtStudentList').value = allStudentNames.join('\n');
+          updateDrawerLineCount();
+          suppressCloudSync = true;
+          saveStateToStorage();
+          suppressCloudSync = false;
+          rebuildSchoolyardEntities();
+          renderCalledHistoryList();
+        }
+        renderCloudPanel();
+        updatePhaseBanner('🏫🛸', `Đã mở lớp ${cls.name}!`, 'Bấm "Bắt một bạn nào!" hoặc phím SPACE để gọi bạn đầu tiên lên bảng!');
+      }
+
+      // Keep the called-history of the open class in sync (debounced)
+      function scheduleCloudSync() {
+        if (suppressCloudSync || !supa || !cloudUser || !activeCloudClassId) return;
+        clearTimeout(cloudSyncTimer);
+        const classId = activeCloudClassId;
+        cloudSyncTimer = setTimeout(async () => {
+          const payload = { students: allStudentNames, called: calledStudentNames };
+          const { error } = await supa.from('classes').update(payload).eq('id', classId);
+          if (error) {
+            showCloudMsg('Chưa đồng bộ được lên mây: ' + translateCloudError(error), true);
+            return;
+          }
+          const local = cloudClasses.find((c) => c.id === classId);
+          if (local) Object.assign(local, payload);
+        }, 1200);
+      }
+
+      async function saveCloudClass() {
+        if (!supa || !cloudUser) return;
+        const name = document.getElementById('cloudClassName').value.trim();
+        if (!name) {
+          showCloudMsg('Nhập tên lớp trước khi lưu nhé (ví dụ: 5A1).', true);
+          document.getElementById('cloudClassName').focus();
+          return;
+        }
+        if (!applyStudentListFromTextarea()) {
+          showCloudMsg('Danh sách học sinh đang trống.', true);
+          return;
+        }
+        clearTimeout(cloudSyncTimer);
+        const btn = document.getElementById('btnCloudSaveClass');
+        btn.disabled = true;
+        const payload = { name, students: allStudentNames, called: calledStudentNames };
+        const query = activeCloudClassId
+          ? supa.from('classes').update(payload).eq('id', activeCloudClassId)
+          : supa.from('classes').insert(payload);
+        const { data, error } = await query.select('id, name, students, called, updated_at').single();
+        btn.disabled = false;
+        if (error) {
+          showCloudMsg(translateCloudError(error), true);
+          return;
+        }
+        setActiveCloudClass(data.id);
+        await fetchCloudClasses();
+        showCloudMsg(`✅ Đã lưu lớp "${data.name}" (${allStudentNames.length} học sinh) lên mây!`);
+      }
+
+      async function deleteCloudClass() {
+        const active = cloudClasses.find((c) => c.id === activeCloudClassId);
+        if (!supa || !active) return;
+        if (!window.confirm(`Xóa lớp "${active.name}" khỏi tài khoản? Danh sách trên máy vẫn được giữ.`)) return;
+        clearTimeout(cloudSyncTimer);
+        const { error } = await supa.from('classes').delete().eq('id', active.id);
+        if (error) {
+          showCloudMsg(translateCloudError(error), true);
+          return;
+        }
+        setActiveCloudClass(null);
+        await fetchCloudClasses();
+        showCloudMsg(`Đã xóa lớp "${active.name}".`);
+      }
+
+      function bindCloudEvents() {
+        const emailEl = document.getElementById('cloudEmail');
+        const passEl = document.getElementById('cloudPassword');
+
+        async function runAuth(mode) {
+          const email = emailEl.value.trim();
+          const password = passEl.value;
+          if (!email || password.length < 6) {
+            showCloudMsg('Nhập email và mật khẩu (ít nhất 6 ký tự) nhé.', true);
+            return;
+          }
+          const btns = [document.getElementById('btnCloudSignIn'), document.getElementById('btnCloudSignUp')];
+          btns.forEach((b) => { b.disabled = true; });
+          const { data, error } = mode === 'signup'
+            ? await supa.auth.signUp({ email, password })
+            : await supa.auth.signInWithPassword({ email, password });
+          btns.forEach((b) => { b.disabled = false; });
+          if (error) {
+            showCloudMsg(translateCloudError(error), true);
+            return;
+          }
+          passEl.value = '';
+          if (mode === 'signup' && !data.session) {
+            showCloudMsg('📧 Đã tạo tài khoản! Mở email để bấm link xác nhận, rồi quay lại đăng nhập.');
+          } else {
+            showCloudMsg(mode === 'signup' ? '🎉 Đăng ký thành công! Lưu lớp đầu tiên của thầy cô nào.' : '👋 Đăng nhập thành công!');
+          }
+        }
+
+        document.getElementById('cloudAuthForm').addEventListener('submit', (e) => {
+          e.preventDefault();
+          runAuth('signin');
+        });
+        document.getElementById('btnCloudSignUp').addEventListener('click', () => runAuth('signup'));
+
+        document.getElementById('btnCloudSignOut').addEventListener('click', async () => {
+          clearTimeout(cloudSyncTimer);
+          setActiveCloudClass(null);
+          await supa.auth.signOut();
+          showCloudMsg('Đã đăng xuất. Danh sách lớp vẫn còn trên máy này.');
+        });
+
+        document.getElementById('selectCloudClass').addEventListener('change', (e) => {
+          const cls = cloudClasses.find((c) => c.id === e.target.value);
+          if (cls) {
+            applyCloudClass(cls);
+          } else {
+            clearTimeout(cloudSyncTimer);
+            setActiveCloudClass(null);
+            renderCloudPanel();
+            document.getElementById('cloudClassName').focus();
+            showCloudMsg('Nhập tên lớp + danh sách học sinh rồi bấm "Lưu lớp lên mây".');
+          }
+        });
+
+        document.getElementById('btnCloudSaveClass').addEventListener('click', saveCloudClass);
+        document.getElementById('btnCloudDeleteClass').addEventListener('click', deleteCloudClass);
       }
 
       function resetRound() {
@@ -3902,15 +4227,7 @@
         document.getElementById('txtStudentList').addEventListener('input', updateDrawerLineCount);
 
         document.getElementById('btnApplyStudentList').addEventListener('click', () => {
-          const raw = document.getElementById('txtStudentList').value || '';
-          const cleaned = raw.split(/\r?\n/).map((s) => s.trim()).filter(Boolean);
-          if (cleaned.length > 0) {
-            allStudentNames = cleaned;
-            // Remove any called names no longer in list
-            calledStudentNames = calledStudentNames.filter((n) => allStudentNames.includes(n));
-            saveStateToStorage();
-            rebuildSchoolyardEntities();
-            renderCalledHistoryList();
+          if (applyStudentListFromTextarea()) {
             const toast = document.getElementById('saveToastMsg');
             toast.classList.remove('hidden');
             setTimeout(() => toast.classList.add('hidden'), 3000);
@@ -3918,6 +4235,11 @@
         });
 
         document.getElementById('btnLoadSampleClass').addEventListener('click', () => {
+          // The sample class must never overwrite the teacher's saved cloud class
+          if (activeCloudClassId) {
+            setActiveCloudClass(null);
+            renderCloudPanel();
+          }
           allStudentNames = [...DEFAULT_STUDENTS];
           calledStudentNames = [];
           document.getElementById('txtStudentList').value = allStudentNames.join('\n');
@@ -4096,6 +4418,7 @@
         rebuildSchoolyardEntities();
         renderCalledHistoryList();
         bindEvents();
+        initCloud();
         updateAudioStatusUI();
         lastTime = performance.now();
         requestAnimationFrame(loop);
