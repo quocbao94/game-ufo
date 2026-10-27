@@ -166,6 +166,12 @@
           <span class="sm:hidden">Âm thanh</span>
         </button>
 
+        <!-- Teacher Account (shown only when Supabase is configured) -->
+        <button id="btnOpenAccount" type="button" class="hidden btn-cartoon px-2.5 sm:px-3.5 py-1.5 rounded-2xl bg-white hover:bg-violet-50 text-violet-800 font-extrabold text-xs sm:text-sm items-center gap-1.5 border-2 border-violet-400 max-w-[11rem]" title="Đăng nhập / Đăng ký để lưu lớp lên mây">
+          <span>👩‍🏫</span>
+          <span id="btnOpenAccountText" class="truncate">Đăng nhập</span>
+        </button>
+
         <!-- Toggle Class List & History Drawer -->
         <button id="btnToggleDrawer" type="button" class="btn-cartoon px-2.5 sm:px-3.5 py-1.5 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-white font-extrabold text-xs sm:text-sm flex items-center gap-1.5 border-2 border-emerald-700" title="Danh sách lớp & Lịch sử gọi tên">
           <span>📋</span>
@@ -3857,6 +3863,9 @@
           activeCloudClassId = localStorage.getItem(STORAGE_KEY_CLOUD_CLASS) || null;
         } catch (err) {}
         document.getElementById('cloudPanel').classList.remove('hidden');
+        const accountBtn = document.getElementById('btnOpenAccount');
+        accountBtn.classList.remove('hidden');
+        accountBtn.classList.add('flex');
         bindCloudEvents();
         // Defer work out of the auth callback (supabase-js recommends not awaiting other calls inside it)
         supa.auth.onAuthStateChange((_event, session) => {
@@ -3896,6 +3905,10 @@
         document.getElementById('cloudAuthForm').classList.toggle('hidden', loggedIn);
         document.getElementById('cloudClassBox').classList.toggle('hidden', !loggedIn);
         document.getElementById('cloudUserEmail').textContent = loggedIn ? cloudUser.email || '' : '';
+        const activeForBtn = loggedIn && cloudClasses.find((c) => c.id === activeCloudClassId);
+        document.getElementById('btnOpenAccountText').textContent = !loggedIn
+          ? 'Đăng nhập'
+          : activeForBtn ? `Lớp ${activeForBtn.name}` : (cloudUser.email || '').split('@')[0];
         if (!loggedIn) return;
 
         const sel = document.getElementById('selectCloudClass');
@@ -4057,6 +4070,16 @@
             showCloudMsg(mode === 'signup' ? '🎉 Đăng ký thành công! Lưu lớp đầu tiên của thầy cô nào.' : '👋 Đăng nhập thành công!');
           }
         }
+
+        document.getElementById('btnOpenAccount').addEventListener('click', () => {
+          const drawer = document.getElementById('sideDrawer');
+          if (drawer.classList.contains('hidden')) {
+            drawer.classList.remove('hidden');
+            resizeCanvas();
+          }
+          document.getElementById('cloudPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+          if (!cloudUser) emailEl.focus();
+        });
 
         document.getElementById('cloudAuthForm').addEventListener('submit', (e) => {
           e.preventDefault();
