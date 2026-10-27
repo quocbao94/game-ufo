@@ -1,0 +1,15 @@
+# Reference / Legacy folders
+ufo-only/
+*.zip
+
+# OS & Editor files
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+
+# Node / Deploy tool caches
+node_modules/
+.vercel/
+.netlify/

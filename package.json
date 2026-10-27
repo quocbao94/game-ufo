@@ -1,0 +1,18 @@
+{
+  "name": "ufo-oi-dung-bat-em",
+  "version": "1.0.0",
+  "description": "UFO ơi! Đừng bắt em! — Mini-game gọi tên học sinh ngẫu nhiên lên bảng trả bài với 6 bối cảnh sân trường Việt Nam",
+  "private": true,
+  "scripts": {
+    "start": "npx --yes serve . -l 3000",
+    "dev": "npx --yes serve . -l 3000",
+    "build": "echo \"Static HTML5 Canvas build ready in root (index.html)\""
+  },
+  "keywords": [
+    "classroom-game",
+    "random-student-picker",
+    "ufo-abduction",
+    "vietnamese-school",
+    "html5-canvas"
+  ]
+}

@@ -1,0 +1,4106 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="description" content="UFO ơi! Đừng bắt em! — Mini-game gọi tên học sinh ngẫu nhiên lên bảng trả bài với 6 bối cảnh sân trường Việt Nam vui nhộn." />
+  <meta name="theme-color" content="#38BDF8" />
+  <meta property="og:title" content="UFO ơi! Đừng bắt em! — Mini-game Gọi Tên Học Sinh Lên Bảng" />
+  <meta property="og:description" content="Trò chơi gọi tên học sinh ngẫu nhiên công bằng, vui nhộn với hiệu ứng tia hút UFO và 6 bối cảnh sân trường Việt Nam đặc sắc." />
+  <meta property="og:type" content="website" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%9B%B8%3C/text%3E%3C/svg%3E" />
+  <title>UFO ơi! Đừng bắt em! — Mini-game Gọi Tên Học Sinh Lên Bảng</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --font-display: 'Baloo 2', 'Nunito', system-ui, sans-serif;
+      --font-body: 'Nunito', system-ui, sans-serif;
+    }
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+    textarea, input {
+      user-select: text;
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: var(--font-body);
+      background: #E0F7FA;
+      color: #1E293B;
+      overflow-x: hidden;
+    }
+    .font-display {
+      font-family: var(--font-display);
+    }
+    /* Cartoon 3D Button Push Effect */
+    .btn-cartoon {
+      transition: transform 0.12s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.12s ease;
+      box-shadow: 0 5px 0 rgba(15, 23, 42, 0.22);
+    }
+    .btn-cartoon:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 7px 0 rgba(15, 23, 42, 0.25);
+    }
+    .btn-cartoon:active:not(:disabled) {
+      transform: translateY(3px);
+      box-shadow: 0 2px 0 rgba(15, 23, 42, 0.22);
+    }
+    .btn-cartoon:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+    .btn-cta-pulse {
+      animation: gentlePulse 2.2s infinite ease-in-out;
+    }
+    @keyframes gentlePulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.03); }
+    }
+    @keyframes popIn {
+      0% { opacity: 0; transform: scale(0.75) translateY(20px); }
+      70% { transform: scale(1.04) translateY(-4px); }
+      100% { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    .animate-pop-in {
+      animation: popIn 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+    @keyframes floatSlow {
+      0%, 100% { transform: translateY(0px) rotate(-2deg); }
+      50% { transform: translateY(-6px) rotate(2deg); }
+    }
+    .animate-float {
+      animation: floatSlow 3s ease-in-out infinite;
+    }
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #F1F5F9;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #CBD5E1;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94A3B8;
+    }
+    /* Pseudo-fullscreen fallback for sandboxed iframes / iOS Safari */
+    body.pseudo-fullscreen #appRoot {
+      position: fixed !important;
+      inset: 0 !important;
+      z-index: 9999 !important;
+      width: 100vw !important;
+      height: 100vh !important;
+    }
+  </style>
+</head>
+<body class="bg-sky-100 text-slate-800 antialiased">
+
+  <!-- MAIN APPLICATION CONTAINER -->
+  <div id="appRoot" class="relative w-full h-screen min-h-[600px] flex flex-col overflow-hidden select-none bg-sky-200">
+
+    <!-- TOP FLOATING NAVIGATION & CONTROLS BAR -->
+    <header class="relative z-20 flex flex-wrap items-center justify-between gap-2 px-3 py-2 sm:px-5 sm:py-2.5 bg-white/90 backdrop-blur-md border-b-4 border-sky-300 shadow-sm">
+      <!-- Game Title & Alien Badge -->
+      <div class="flex items-center gap-2.5">
+        <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-gradient-to-br from-violet-500 via-fuchsia-500 to-amber-400 flex items-center justify-center shadow-md border-2 border-white animate-float" title="UFO Tinh Nghịch">
+          <span class="text-xl sm:text-2xl" role="img" aria-label="UFO">🛸</span>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="font-display font-extrabold text-lg sm:text-2xl text-slate-800 tracking-tight leading-none">
+              UFO ơi! <span class="text-rose-500">Đừng bắt em!</span>
+            </h1>
+            <span id="statusBadge" class="hidden md:inline-flex items-center gap-1 px-2.5 py-0.5 text-xs font-extrabold rounded-full bg-emerald-100 text-emerald-700 border border-emerald-300">
+              <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+              Sân trường vui nhộn
+            </span>
+          </div>
+          <p class="text-[11px] sm:text-xs font-bold text-slate-500 leading-tight mt-0.5">
+            Đang có <span id="remainingCountBadge" class="text-indigo-600 font-extrabold">0</span>/<span id="totalCountBadge" class="font-extrabold">0</span> bạn dưới sân • Đã lên bảng: <span id="calledCountBadge" class="text-rose-600 font-extrabold">0</span>
+          </p>
+        </div>
+      </div>
+
+      <!-- Right Action Controls -->
+      <div class="flex items-center flex-wrap gap-1.5 sm:gap-2">
+        <!-- Quick Schoolyard Theme Selector -->
+        <div class="flex items-center bg-amber-50 border-2 border-amber-300 rounded-2xl px-2 py-1 gap-1 shadow-sm">
+          <button id="btnCycleYardTheme" type="button" class="btn-cartoon w-7 h-7 rounded-xl bg-amber-300 hover:bg-amber-200 text-slate-900 flex items-center justify-center font-bold text-sm" title="Bấm để đổi nhanh qua các kiểu sân trường">
+            🏞️
+          </button>
+          <select id="selectYardTheme" class="bg-transparent font-extrabold text-xs sm:text-sm text-slate-800 outline-none cursor-pointer pr-1" title="Chọn bối cảnh sân trường Việt Nam">
+            <option value="phuong_vi">🌸 Sân Trường Hoa Phượng</option>
+            <option value="khai_giang">🎈 Ngày Hội Khai Giảng</option>
+            <option value="hien_dai">🏀 Trường Hiện Đại & Thể Thao</option>
+            <option value="mua_xuan">🌼 Sân Trường Mùa Xuân (Tết)</option>
+            <option value="trung_thu">🏮 Đêm Hội Trăng Rằm</option>
+            <option value="vung_cao">⛰️ Điểm Trường Vùng Cao</option>
+          </select>
+        </div>
+
+        <!-- Quick Sound Mute/Unmute + Volume -->
+        <div class="flex items-center bg-sky-50 border-2 border-sky-200 rounded-2xl px-2 py-1 gap-1.5">
+          <button id="btnToggleMute" type="button" class="btn-cartoon w-8 h-8 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-900 flex items-center justify-center font-bold text-base" title="Bật / Tắt âm thanh">
+            <span id="iconMuteState">🔊</span>
+          </button>
+          <input id="sliderMasterVol" type="range" min="0" max="100" value="85" class="w-16 sm:w-20 accent-rose-500 cursor-pointer h-2 bg-sky-200 rounded-lg" title="Âm lượng tổng" aria-label="Âm lượng tổng" />
+          <span id="labelMasterVol" class="text-xs font-extrabold text-slate-700 w-8 text-right hidden sm:inline">85%</span>
+        </div>
+
+        <!-- Quick Test Audio Mix Button -->
+        <button id="btnOpenAudioModal" type="button" class="btn-cartoon px-2.5 sm:px-3.5 py-1.5 rounded-2xl bg-violet-600 hover:bg-violet-500 text-white font-extrabold text-xs sm:text-sm flex items-center gap-1.5 border-2 border-violet-800" title="Nghe thử bản phối âm thanh & thay đổi file">
+          <span>🎧</span>
+          <span class="hidden sm:inline">Phối & Thử Âm</span>
+          <span class="sm:hidden">Âm thanh</span>
+        </button>
+
+        <!-- Toggle Class List & History Drawer -->
+        <button id="btnToggleDrawer" type="button" class="btn-cartoon px-2.5 sm:px-3.5 py-1.5 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-white font-extrabold text-xs sm:text-sm flex items-center gap-1.5 border-2 border-emerald-700" title="Danh sách lớp & Lịch sử gọi tên">
+          <span>📋</span>
+          <span>Danh sách lớp</span>
+        </button>
+
+        <!-- Fullscreen Toggle -->
+        <button id="btnFullscreen" type="button" class="btn-cartoon px-2.5 py-1.5 rounded-2xl bg-slate-800 hover:bg-slate-700 text-white font-extrabold text-xs sm:text-sm flex items-center gap-1 border-2 border-slate-950" title="Toàn màn hình để chiếu trên lớp">
+          <span id="iconFullscreen">⛶</span>
+          <span class="hidden lg:inline" id="textFullscreen">Toàn màn hình</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- BROWSER AUDIO AUTOPLAY UNLOCK BANNER (Shown only if audio context is suspended or blocked) -->
+    <div id="audioUnlockBanner" class="hidden relative z-20 bg-amber-100 border-b-2 border-amber-300 px-4 py-1.5 text-xs sm:text-sm font-bold text-amber-900 flex items-center justify-between gap-2">
+      <div class="flex items-center gap-2">
+        <span>🔔</span>
+        <span>Trình duyệt (đặc biệt Safari iPhone/iPad) cần 1 cú chạm để kích hoạt tiếng reo hò sân trường.</span>
+      </div>
+      <button id="btnUnlockAudioBanner" type="button" class="px-3 py-1 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-900 font-extrabold border border-amber-600 shrink-0">
+        Bật tiếng ngay
+      </button>
+    </div>
+
+    <!-- MAIN WORKSPACE: 2D SCHOOLYARD CANVAS + COLLAPSIBLE SIDE DRAWER -->
+    <div class="relative flex-1 flex overflow-hidden">
+
+      <!-- 2D ANIMATED SCHOOLYARD STAGE -->
+      <main id="stageContainer" class="relative flex-1 h-full overflow-hidden bg-sky-200">
+        <canvas id="gameCanvas" class="block w-full h-full cursor-pointer"></canvas>
+
+        <!-- TOP-LEFT FLOATING GAME STATUS PILL -->
+        <div class="pointer-events-none absolute top-3 left-3 z-10 flex flex-col gap-1.5 max-w-xs sm:max-w-md">
+          <div id="livePhaseBanner" class="bg-white/90 backdrop-blur-md px-3.5 py-2 rounded-2xl border-2 border-sky-300 shadow-md flex items-center gap-2.5">
+            <span id="livePhaseEmoji" class="text-xl sm:text-2xl">🛸</span>
+            <div>
+              <div id="livePhaseTitle" class="font-display font-extrabold text-xs sm:text-sm text-slate-800 leading-tight">
+                UFO đang lượn lờ ngắm sân trường...
+              </div>
+              <div id="livePhaseDesc" class="text-[11px] font-bold text-slate-500 leading-tight">
+                Bấm nút cam bên dưới để UFO truy tìm 1 bạn lên bảng!
+              </div>
+            </div>
+          </div>
+
+          <!-- Audio Active Indicator Pill -->
+          <div id="audioStatusPill" class="bg-slate-900/75 backdrop-blur-sm text-white px-3 py-1 rounded-full text-[11px] font-bold inline-flex items-center gap-1.5 w-fit shadow">
+            <span id="audioWaveDot" class="w-2 h-2 rounded-full bg-emerald-400"></span>
+            <span id="audioStatusText">Âm thanh: Chỉ bật tiếng UFO & Tia hút</span>
+          </div>
+        </div>
+
+        <!-- TOP-RIGHT FLOATING RECENTLY CALLED MINI-PILL -->
+        <div class="absolute top-3 right-3 z-10 flex flex-col items-end gap-1.5">
+          <div class="bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-2xl border-2 border-rose-200 shadow-md flex items-center gap-2 text-xs font-bold">
+            <span class="text-rose-500">🏆 Vừa lên bảng:</span>
+            <span id="lastCalledMini" class="font-extrabold text-slate-800">Chưa có ai</span>
+            <button id="btnResetRoundQuick" type="button" class="ml-1 px-2 py-0.5 rounded-lg bg-rose-100 hover:bg-rose-200 text-rose-700 font-extrabold text-[11px] transition" title="Đưa tất cả học sinh đã gọi trở lại sân trường">
+              🔄 Vòng mới
+            </button>
+          </div>
+        </div>
+
+        <!-- BOTTOM CENTER MAIN TEACHER CTA BUTTON -->
+        <div class="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2 w-full max-w-lg px-4 pointer-events-none">
+          <div class="flex items-center gap-2 pointer-events-auto">
+            <button id="btnTriggerCatch" type="button" class="btn-cartoon btn-cta-pulse px-6 sm:px-8 py-3 sm:py-4 rounded-3xl bg-gradient-to-b from-amber-300 via-orange-400 to-rose-500 hover:from-amber-200 hover:to-rose-400 text-white font-display font-extrabold text-lg sm:text-2xl tracking-wide border-4 border-white shadow-xl flex items-center gap-3" title="Bấm nút hoặc nhấn phím SPACE để UFO bắt 1 bạn">
+              <span class="text-2xl sm:text-3xl drop-shadow">🛸</span>
+              <span id="btnTriggerCatchText" class="drop-shadow-[0_2px_2px_rgba(0,0,0,0.35)]">Bắt một bạn nào!</span>
+              <span class="hidden sm:inline-block px-2 py-0.5 text-[11px] font-sans font-black uppercase tracking-wider bg-black/20 text-white/95 rounded-lg border border-white/30">SPACE</span>
+            </button>
+
+            <button id="btnQuickPreviewAudio" type="button" class="btn-cartoon px-3.5 py-3 sm:py-4 rounded-3xl bg-white/95 hover:bg-sky-50 text-violet-700 font-extrabold text-xs sm:text-sm border-4 border-violet-300 shadow-lg flex flex-col items-center justify-center leading-none gap-1" title="Nghe thử nhanh đoạn phối 4.5 giây (Đuổi bắt + Tia hút + Cười vang)">
+              <span class="text-lg">🎵</span>
+              <span class="text-[10px]">Thử tiếng</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- CELEBRATION RESULT OVERLAY MODAL (When a student is abducted into the UFO) -->
+        <div id="winnerOverlay" class="hidden absolute inset-0 z-30 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div class="animate-pop-in relative w-full max-w-xl bg-gradient-to-b from-white via-amber-50 to-sky-50 rounded-[2rem] border-4 border-amber-400 shadow-2xl p-6 sm:p-8 text-center overflow-hidden">
+            <!-- Decorative Confetti Header -->
+            <div class="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-amber-200/80 text-amber-900 font-extrabold text-xs sm:text-sm mb-3 border border-amber-400">
+              <span>🛸</span>
+              <span>TIA HÚT UFO ĐÃ CHỌN TRÚNG!</span>
+              <span>🎉</span>
+            </div>
+
+            <!-- Drawn Portrait of Chosen Chibi Student + Dropped Shoe Joke -->
+            <div class="relative mx-auto w-36 h-36 sm:w-44 sm:h-44 rounded-full bg-gradient-to-b from-cyan-200 via-sky-100 to-emerald-100 border-4 border-white shadow-inner flex items-center justify-center mb-3">
+              <canvas id="winnerAvatarCanvas" width="180" height="180" class="w-36 h-36 sm:w-44 sm:h-44"></canvas>
+              <div id="winnerShoeBadge" class="absolute -bottom-2 -right-2 bg-rose-500 text-white text-xs font-extrabold px-2.5 py-1 rounded-full border-2 border-white shadow rotate-6">
+                👟 Rớt 1 chiếc giày!
+              </div>
+            </div>
+
+            <!-- Chosen Student Name (HUGE & EASY TO READ FOR CLASSROOM PROJECTOR) -->
+            <div class="my-2 px-2">
+              <div id="winnerStudentName" class="font-display font-black text-3xl sm:text-5xl md:text-6xl text-indigo-950 tracking-tight break-words drop-shadow-sm">
+                Nguyễn Minh An
+              </div>
+            </div>
+
+            <!-- Prompt Message -->
+            <p class="font-display font-extrabold text-xl sm:text-2xl text-rose-600 mt-1 mb-2">
+              🌟 Mời bạn lên bảng trả bài! 🌟
+            </p>
+            <p id="winnerFunnyQuote" class="text-xs sm:text-sm font-bold text-slate-600 italic mb-6">
+              “Người ngoài hành tinh bảo bạn thuộc bài lắm, lên bảng tỏa sáng nhé!”
+            </p>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-wrap items-center justify-center gap-3">
+              <button id="btnContinueNext" type="button" class="btn-cartoon px-7 py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white font-display font-extrabold text-base sm:text-xl border-2 border-emerald-700 flex items-center gap-2">
+                <span>▶️</span>
+                <span>Tiếp tục (Gọi bạn kế tiếp)</span>
+              </button>
+              <button id="btnPutBackStudent" type="button" class="btn-cartoon px-4 py-3.5 rounded-2xl bg-amber-100 hover:bg-amber-200 text-amber-900 font-extrabold text-xs sm:text-sm border-2 border-amber-300" title="Cho bạn này xuống lại sân trường (chưa tính là đã gọi)">
+                ↩️ Thả bạn xuống sân
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </main>
+
+      <!-- SIDE DRAWER: CLASS LIST, SETTINGS & HISTORY -->
+      <aside id="sideDrawer" class="hidden absolute md:relative right-0 top-0 bottom-0 z-30 w-full max-w-sm sm:max-w-md bg-white/95 backdrop-blur-md border-l-4 border-sky-300 shadow-2xl flex flex-col h-full">
+        <!-- Drawer Header -->
+        <div class="flex items-center justify-between px-4 py-3 bg-sky-50 border-b-2 border-sky-200">
+          <div class="flex items-center gap-2">
+            <span class="text-xl">🏫</span>
+            <h2 class="font-display font-extrabold text-base sm:text-lg text-slate-800">
+              Quản lý Lớp học & Lịch sử
+            </h2>
+          </div>
+          <button id="btnCloseDrawer" type="button" class="w-8 h-8 rounded-xl bg-slate-200 hover:bg-rose-500 hover:text-white text-slate-700 font-extrabold flex items-center justify-center transition" title="Đóng bảng">
+            ✕
+          </button>
+        </div>
+
+        <!-- Drawer Body (Scrollable) -->
+        <div class="flex-1 overflow-y-auto p-4 space-y-5">
+
+          <!-- 1. Selection Rules -->
+          <div class="bg-amber-50/90 border-2 border-amber-200 rounded-2xl p-3.5 space-y-2.5">
+            <div class="flex items-center justify-between">
+              <label for="chkNoRepeat" class="font-extrabold text-xs sm:text-sm text-slate-800 cursor-pointer flex items-center gap-2">
+                <input id="chkNoRepeat" type="checkbox" checked class="w-4 h-4 accent-emerald-600 rounded cursor-pointer" />
+                <span>Không gọi lại bạn đã lên bảng</span>
+              </label>
+              <span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-amber-200 text-amber-900">Mặc định</span>
+            </div>
+            <p class="text-[11px] text-slate-600 font-semibold leading-relaxed">
+              Khi bật, học sinh đã được UFO hút lên sẽ ngồi trên trạm vũ trụ (vào danh sách Đã gọi) để đảm bảo công bằng 100%.
+            </p>
+          </div>
+
+          <!-- 2. Student List Textarea -->
+          <div class="space-y-2">
+            <div class="flex items-center justify-between">
+              <label for="txtStudentList" class="font-display font-extrabold text-sm text-slate-800 flex items-center gap-1.5">
+                <span>📝</span>
+                <span>Danh sách học sinh (mỗi dòng 1 tên)</span>
+              </label>
+              <span id="drawerLineCount" class="text-xs font-extrabold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full border border-indigo-200">
+                16 học sinh
+              </span>
+            </div>
+            <textarea id="txtStudentList" rows="8" class="w-full rounded-2xl border-2 border-sky-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 p-3 text-xs sm:text-sm font-bold text-slate-800 leading-relaxed outline-none transition bg-sky-50/40" placeholder="Nhập tên học sinh, mỗi dòng 1 bạn..."></textarea>
+
+            <!-- Preset & Save Buttons -->
+            <div class="flex flex-wrap items-center gap-2 pt-1">
+              <button id="btnApplyStudentList" type="button" class="btn-cartoon flex-1 py-2 px-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-xs sm:text-sm flex items-center justify-center gap-1.5">
+                <span>💾</span>
+                <span>Cập nhật & Lưu trên máy</span>
+              </button>
+              <button id="btnLoadSampleClass" type="button" class="btn-cartoon py-2 px-3 rounded-xl bg-sky-100 hover:bg-sky-200 text-sky-900 font-extrabold text-xs border border-sky-300" title="Tải danh sách lớp mẫu">
+                ✨ Lớp mẫu
+              </button>
+            </div>
+            <p id="saveToastMsg" class="text-[11px] font-bold text-emerald-600 hidden">
+              ✅ Đã lưu danh sách vào bộ nhớ thiết bị và tạo nhân vật mới!
+            </p>
+          </div>
+
+          <!-- 3. History of Called Students -->
+          <div class="bg-slate-50 border-2 border-slate-200 rounded-2xl p-3.5 space-y-2.5">
+            <div class="flex items-center justify-between">
+              <h3 class="font-display font-extrabold text-sm text-slate-800 flex items-center gap-1.5">
+                <span>🛸</span>
+                <span>Lịch sử đã gọi lên bảng (<span id="historyCountLabel">0</span>)</span>
+              </h3>
+              <button id="btnResetRoundDrawer" type="button" class="px-2.5 py-1 rounded-xl bg-rose-500 hover:bg-rose-400 text-white font-extrabold text-xs transition shadow-sm">
+                🔄 Bắt đầu vòng mới
+              </button>
+            </div>
+            <div id="calledHistoryList" class="max-h-44 overflow-y-auto space-y-1.5 pr-1">
+              <div class="text-xs text-slate-400 italic py-2 text-center">
+                Chưa có học sinh nào bị UFO bắt trong vòng này.
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </aside>
+
+    </div>
+
+    <!-- AUDIO MIXER, PREVIEW & CUSTOM SOUND REPLACEMENT MODAL -->
+    <div id="audioStudioModal" class="hidden fixed inset-0 z-50 bg-slate-900/65 backdrop-blur-sm flex items-center justify-center p-3 sm:p-5 overflow-y-auto">
+      <div class="animate-pop-in bg-white w-full max-w-3xl rounded-3xl border-4 border-violet-400 shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
+        <!-- Modal Header -->
+        <div class="flex items-center justify-between px-5 py-3.5 bg-gradient-to-r from-violet-600 via-indigo-600 to-sky-600 text-white">
+          <div class="flex items-center gap-2.5">
+            <span class="text-2xl">🎧</span>
+            <div>
+              <h2 class="font-display font-extrabold text-base sm:text-xl leading-tight">
+                Bộ Phối Thử & Kiểm Tra Âm Thanh Sân Trường
+              </h2>
+              <p class="text-[11px] sm:text-xs text-violet-100 font-semibold">
+                Đảm bảo vui nhộn như chơi đuổi bắt — Không có tiếng hét kinh dị hay rít chói tai
+              </p>
+            </div>
+          </div>
+          <button id="btnCloseAudioModal" type="button" class="w-9 h-9 rounded-xl bg-white/20 hover:bg-rose-500 text-white font-extrabold flex items-center justify-center transition">
+            ✕
+          </button>
+        </div>
+
+        <!-- Modal Scrollable Content -->
+        <div class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-5 text-xs sm:text-sm">
+
+          <!-- Transparency & Verification Notice -->
+          <div class="bg-amber-50 border-2 border-amber-300 rounded-2xl p-3.5 text-amber-950 space-y-1.5">
+            <div class="font-extrabold flex items-center gap-1.5 text-amber-900">
+              <span>🔍</span>
+              <span>Thông báo minh bạch về kiểm tra âm thanh & bản quyền:</span>
+            </div>
+            <p class="text-xs leading-relaxed font-semibold text-slate-700">
+              • <strong>Minh bạch khả năng nghe:</strong> Môi trường máy ảo tạo code của trợ lý AI không có loa vật lý để nghe trực tiếp bằng tai người. Vì vậy, tôi tuyệt đối <strong>không tự ý khẳng định chủ quan</strong> mà đã chọn lọc các bản thu thực tế từ thư viện mở có mô tả rõ ràng (tiếng trẻ em vui chơi, cười khúc khích, reo hò tập thể, không có từ khóa <em>scream/horror/pain</em>), đồng thời thiết kế <strong>Bàn Phối Thử (Preview Deck)</strong> ngay bên dưới để thầy/cô bấm nghe kiểm tra trực tiếp từng lớp âm và thay thế bất kỳ âm nào chỉ bằng 1 cú nhấp.
+            </p>
+          </div>
+
+          <!-- 1. Interactive Short Mix Preview Deck -->
+          <div class="bg-gradient-to-br from-violet-50 via-indigo-50 to-sky-50 border-2 border-indigo-200 rounded-2xl p-4 space-y-3">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <h3 class="font-display font-extrabold text-base text-indigo-950">
+                  ▶️ Nghe thử đoạn phối mẫu (4.5 giây trọn vẹn 1 lượt bắt)
+                </h3>
+                <p class="text-xs text-slate-600 font-semibold">
+                  Phối nhiều giọng ngắn lệch thời điểm & phân kênh Trái/Phải (Stereo Panning -0.65 đến +0.65):
+                </p>
+              </div>
+              <div class="flex items-center gap-2">
+                <button id="btnPlayFullDemoMix" type="button" class="btn-cartoon px-4 py-2.5 rounded-2xl bg-gradient-to-r from-rose-500 to-orange-500 hover:from-rose-400 hover:to-orange-400 text-white font-extrabold text-xs sm:text-sm flex items-center gap-2 shadow">
+                  <span>▶️</span>
+                  <span id="txtPlayFullDemoMix">Nghe đoạn phối thử (4.5s)</span>
+                </button>
+                <button id="btnStopAllAudio" type="button" class="btn-cartoon px-3 py-2.5 rounded-2xl bg-slate-200 hover:bg-slate-300 text-slate-800 font-extrabold text-xs">
+                  ⏹ Dừng
+                </button>
+              </div>
+            </div>
+
+            <!-- Timeline Visualization of the Mix -->
+            <div class="bg-white rounded-xl p-3 border border-indigo-100 space-y-2">
+              <div class="flex items-center justify-between text-[11px] font-extrabold text-slate-500">
+                <span>0.0s: Chạy đuổi bắt & reo hò (Trái/Phải)</span>
+                <span>2.2s: Tia hút & "Ối! Woo!"</span>
+                <span>3.3s: Cả nhóm cười vang & Chúc mừng</span>
+              </div>
+              <div class="w-full h-3 bg-slate-100 rounded-full overflow-hidden border border-slate-200">
+                <div id="demoMixProgressBar" class="h-full w-0 bg-gradient-to-r from-sky-400 via-violet-500 to-rose-500 transition-all duration-100"></div>
+              </div>
+              <div id="demoMixStepStatus" class="text-xs font-extrabold text-indigo-700 text-center">
+                Bấm "Nghe đoạn phối thử" để kiểm tra sự cân bằng giữa tiếng học sinh và tiếng UFO.
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. Individual Sound Layers, License Info, Test & Easy Replacement -->
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <h3 class="font-display font-extrabold text-base text-slate-800">
+                🎚️ Từng lớp âm thanh, Nguồn bản quyền & Thay âm thanh dễ dàng
+              </h3>
+              <button id="btnResetDefaultSounds" type="button" class="text-xs font-extrabold text-indigo-600 hover:underline">
+                ↺ Khôi phục mặc định
+              </button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <!-- Layer 1: Playground Crowd & Chase -->
+              <div class="p-3.5 rounded-2xl border-2 border-sky-200 bg-sky-50/50 space-y-2 flex flex-col justify-between">
+                <div class="space-y-1">
+                  <div class="flex items-center justify-between">
+                    <span class="font-extrabold text-slate-800">1. Tiếng sân trường & Đuổi bắt</span>
+                    <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300">Bản thu thật • Free License</span>
+                  </div>
+                  <p class="text-[11px] text-slate-600 font-semibold">
+                    • <strong>Nguồn:</strong> Google Sound Library / YouTube Audio Library (<code>kids_playing.ogg</code> & <code>children_group_ambience.ogg</code>).<br/>
+                    • <strong>Giấy phép:</strong> Google/YouTube Audio Library License (cho phép dùng miễn phí trong game & ứng dụng web).
+                  </p>
+                </div>
+                <div class="pt-2 border-t border-sky-200/80 flex flex-wrap items-center justify-between gap-2">
+                  <button type="button" data-test-layer="crowd" class="btn-test-layer btn-cartoon px-3 py-1.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-white font-extrabold text-xs">
+                    🔊 Nghe thử lớp này
+                  </button>
+                  <label class="cursor-pointer px-2.5 py-1.5 rounded-xl bg-white hover:bg-slate-100 text-slate-700 font-extrabold text-xs border border-slate-300 inline-flex items-center gap-1">
+                    <span>📁 Thay file (.mp3/.wav/.ogg)</span>
+                    <input type="file" accept="audio/*" data-replace-layer="crowd" class="input-replace-audio hidden" />
+                  </label>
+                </div>
+                <div id="customBadge-crowd" class="hidden text-[11px] font-extrabold text-emerald-700"></div>
+              </div>
+
+              <!-- Layer 2: Multi-Voice Laugh & Giggle (Boy + Girl + Group) -->
+              <div class="p-3.5 rounded-2xl border-2 border-rose-200 bg-rose-50/50 space-y-2 flex flex-col justify-between">
+                <div class="space-y-1">
+                  <div class="flex items-center justify-between">
+                    <span class="font-extrabold text-slate-800">2. Nhóm trẻ cười khúc khích (Nam & Nữ)</span>
+                    <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300">CC0 / CC-BY 3.0</span>
+                  </div>
+                  <p class="text-[11px] text-slate-600 font-semibold">
+                    • <strong>Nguồn:</strong> Wikimedia Commons / Freesound: <code>Small_group_laughter.ogg</code>, <code>Boy_giggle.ogg</code>, <code>Giggle.ogg</code> (tác giả Lomond, Freesound #155942) & <code>Laughter.ogg</code> (tác giả ezwa, Public Domain).<br/>
+                    • <strong>Phối kênh:</strong> Trộn nhiều giọng ngắn lệch nhịp Trái/Phải.
+                  </p>
+                </div>
+                <div class="pt-2 border-t border-rose-200/80 flex flex-wrap items-center justify-between gap-2">
+                  <button type="button" data-test-layer="laugh" class="btn-test-layer btn-cartoon px-3 py-1.5 rounded-xl bg-rose-500 hover:bg-rose-400 text-white font-extrabold text-xs">
+                    🔊 Nghe thử lớp này
+                  </button>
+                  <label class="cursor-pointer px-2.5 py-1.5 rounded-xl bg-white hover:bg-slate-100 text-slate-700 font-extrabold text-xs border border-slate-300 inline-flex items-center gap-1">
+                    <span>📁 Thay file (.mp3/.wav/.ogg)</span>
+                    <input type="file" accept="audio/*" data-replace-layer="laugh" class="input-replace-audio hidden" />
+                  </label>
+                </div>
+                <div id="customBadge-laugh" class="hidden text-[11px] font-extrabold text-emerald-700"></div>
+              </div>
+
+              <!-- Layer 3: Playful Pop / "Ối! Woo!" & Cheer when Abducted -->
+              <div class="p-3.5 rounded-2xl border-2 border-amber-200 bg-amber-50/50 space-y-2 flex flex-col justify-between">
+                <div class="space-y-1">
+                  <div class="flex items-center justify-between">
+                    <span class="font-extrabold text-slate-800">3. Tiếng bất ngờ vui ("Ối! Woo!") & Reo hò</span>
+                    <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300">Bản thu thật + Hoạt hình</span>
+                  </div>
+                  <p class="text-[11px] text-slate-600 font-semibold">
+                    • <strong>Nguồn:</strong> Google Sound Library (<code>team_cheer.ogg</code> + <code>cartoon_boing.ogg</code>) kết hợp giọng cảm thán ngắn vui nhộn khi giật mình rơi chiếc giày (tuyệt đối không dùng tiếng la hét kinh dị).
+                  </p>
+                </div>
+                <div class="pt-2 border-t border-amber-200/80 flex flex-wrap items-center justify-between gap-2">
+                  <button type="button" data-test-layer="abductVocal" class="btn-test-layer btn-cartoon px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-900 font-extrabold text-xs">
+                    🔊 Nghe thử lớp này
+                  </button>
+                  <label class="cursor-pointer px-2.5 py-1.5 rounded-xl bg-white hover:bg-slate-100 text-slate-700 font-extrabold text-xs border border-slate-300 inline-flex items-center gap-1">
+                    <span>📁 Thay file (.mp3/.wav/.ogg)</span>
+                    <input type="file" accept="audio/*" data-replace-layer="abductVocal" class="input-replace-audio hidden" />
+                  </label>
+                </div>
+                <div id="customBadge-abductVocal" class="hidden text-[11px] font-extrabold text-emerald-700"></div>
+              </div>
+
+              <!-- Layer 4: Gentle UFO Hover, Beam & Result Chime -->
+              <div class="p-3.5 rounded-2xl border-2 border-violet-200 bg-violet-50/50 space-y-2 flex flex-col justify-between">
+                <div class="space-y-1">
+                  <div class="flex items-center justify-between">
+                    <span class="font-extrabold text-slate-800">4. Âm UFO lượn, Tia hút & Chuông kết quả</span>
+                    <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-violet-100 text-violet-800 border border-violet-300">Âm lượng dịu (Không lấn giọng)</span>
+                  </div>
+                  <p class="text-[11px] text-slate-600 font-semibold">
+                    • <strong>Thiết kế:</strong> Âm UFO êm dịu (Gain ≤ 18% để không lấn tiếng học sinh), tia hút lung linh và hợp âm chuông vui vẻ khi công bố tên bạn lên bảng.
+                  </p>
+                </div>
+                <div class="pt-2 border-t border-violet-200/80 flex flex-wrap items-center justify-between gap-2">
+                  <button type="button" data-test-layer="ufoBeam" class="btn-test-layer btn-cartoon px-3 py-1.5 rounded-xl bg-violet-600 hover:bg-violet-500 text-white font-extrabold text-xs">
+                    🔊 Nghe thử UFO & Tia hút
+                  </button>
+                  <label class="cursor-pointer px-2.5 py-1.5 rounded-xl bg-white hover:bg-slate-100 text-slate-700 font-extrabold text-xs border border-slate-300 inline-flex items-center gap-1">
+                    <span>📁 Thay file (.mp3/.wav/.ogg)</span>
+                    <input type="file" accept="audio/*" data-replace-layer="ufoBeam" class="input-replace-audio hidden" />
+                  </label>
+                </div>
+                <div id="customBadge-ufoBeam" class="hidden text-[11px] font-extrabold text-emerald-700"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Voice vs UFO Balance Slider -->
+          <div class="bg-slate-50 border-2 border-slate-200 rounded-2xl p-3.5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div>
+              <div class="font-extrabold text-slate-800">⚖️ Cân bằng: Âm lượng giọng trẻ em vs. Hiệu ứng UFO</div>
+              <div class="text-xs text-slate-500 font-semibold">Giữ tiếng học sinh nổi bật, tiếng UFO chỉ làm nền vui nhộn</div>
+            </div>
+            <div class="flex items-center gap-3 w-full sm:w-auto">
+              <span class="text-xs font-bold text-slate-600">UFO dịu</span>
+              <input id="sliderUfoBalance" type="range" min="10" max="100" value="65" class="w-32 accent-violet-600 cursor-pointer" />
+              <span id="labelUfoBalance" class="text-xs font-extrabold text-violet-700 w-10">65%</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="px-5 py-3 bg-slate-100 border-t border-slate-200 flex items-center justify-end">
+          <button id="btnDoneAudioModal" type="button" class="btn-cartoon px-6 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-xs sm:text-sm">
+            Đóng & Quay lại sân trường
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- GAME & AUDIO ENGINE SCRIPT -->
+  <script>
+    (function () {
+      'use strict';
+
+      // =========================================================================
+      // 1. DEFAULT DATA & STATE MANAGEMENT
+      // =========================================================================
+      const STORAGE_KEY_STUDENTS = 'ufo_game_students_v1';
+      const STORAGE_KEY_CALLED = 'ufo_game_called_v1';
+      const STORAGE_KEY_NOREPEAT = 'ufo_game_norepeat_v1';
+      const STORAGE_KEY_THEME = 'ufo_game_yard_theme_v1';
+      const YARD_THEME_ORDER = ['phuong_vi', 'khai_giang', 'hien_dai', 'mua_xuan', 'trung_thu', 'vung_cao'];
+      let currentYardTheme = 'phuong_vi';
+
+      const DEFAULT_STUDENTS = [
+        'Nguyễn Minh An',
+        'Trần Bảo Châu',
+        'Lê Hoàng Bách',
+        'Phạm Ngọc Diệp',
+        'Vũ Đức Duy',
+        'Đặng Thảo Linh',
+        'Hoàng Gia Bảo',
+        'Bùi Khánh Ngân',
+        'Đỗ Tuấn Kiệt',
+        'Ngô Phương Anh',
+        'Dương Minh Khôi',
+        'Lý Thanh Trúc',
+        'Trương Quốc Anh',
+        'Mai Hà Vy',
+        'Hồ Nhật Minh',
+        'Phan Bảo Ngọc'
+      ];
+
+      const FUNNY_QUOTES = [
+        '“Người ngoài hành tinh bảo bạn thuộc bài lắm, lên bảng tỏa sáng nhé!”',
+        '“Hết chạy trốn nha! Cả lớp vỗ tay cổ vũ bạn lên bảng nào!”',
+        '“Chiếc giày còn rơi lại dưới sân, trả bài điểm 10 rồi nhận lại giày nhé!”',
+        '“Radar UFO phát hiện năng lượng thông thái cực mạnh từ bạn!”',
+        '“Ú òa! Bạn là người may mắn nhất chuyến tàu vũ trụ hôm nay!”'
+      ];
+
+      const CHASE_EXCLAMATIONS = [
+        'Á á chạy mau!',
+        'Đừng bắt em!',
+        'Ahihi né nè!',
+        'Ối UFO kìa!',
+        'Chạy đi các cậu ơi!',
+        'Bắt bạn kia kìa!',
+        'Haha vui quá!',
+        'Trốn vào gốc cây!'
+      ];
+
+      const BYSTANDER_CHEERS = [
+        'Haha thoát rồi!',
+        'Cố lên bạn ơi!',
+        'May quá không phải mình!',
+        'Vẫy tay chào UFO kìa!',
+        'Trả bài 10 điểm nha!',
+        'Rớt chiếc giày kìa haha!'
+      ];
+
+      const PASTEL_SHIRTS = [
+        '#FF6B8B', '#4ECDC4', '#FFB830', '#845EC2',
+        '#00C9A7', '#FF8066', '#3B82F6', '#EC4899',
+        '#10B981', '#F59E0B', '#6366F1', '#14B8A6'
+      ];
+      const PASTEL_PANTS = [
+        '#1E3A8A', '#374151', '#065F46', '#7C2D12',
+        '#4C1D95', '#831843', '#1F2937', '#312E81'
+      ];
+      const HAIR_COLORS = [
+        '#1E1B18', '#3E2723', '#4A2C11', '#2D1B0E',
+        '#5D4037', '#263238', '#4E342E'
+      ];
+      const SHOE_COLORS = [
+        '#EF4444', '#3B82F6', '#F59E0B', '#10B981', '#8B5CF6', '#EC4899'
+      ];
+
+      let allStudentNames = [];
+      let calledStudentNames = [];
+      let noRepeatMode = true;
+
+      // Game State Machine: 'IDLE' | 'CHASING' | 'ABDUCTING' | 'RESULT'
+      let gameState = 'IDLE';
+      let stateTimer = 0;
+      let chaseDuration = 3.6; // 3.6 seconds of suspense chase
+      let chosenStudent = null;
+      let ufoFeintTargets = [];
+      let currentFeintIndex = 0;
+
+      // Dropped shoe & confetti particles
+      let droppedShoes = [];
+      let confettiParticles = [];
+      let clouds = [];
+      let birds = [];
+
+      // =========================================================================
+      // 2. SPATIAL MULTI-LAYER AUDIO ENGINE (Real Licensed Clips + Stereo Panning)
+      // =========================================================================
+      // 2. UFO AUDIO ENGINE (UFO Hover, Tractor Beam & Victory Chime Only;
+      //    Student audio slots left empty for user to add custom files later)
+      // =========================================================================
+      const REAL_AUDIO_SOURCES = {
+        crowd: [],
+        laugh: [],
+        abductVocal: [],
+        ufoBeam: [
+          'https://actions.google.com/sounds/v1/science_fiction/alien_beam.ogg'
+        ]
+      };
+
+      const customAudioBlobs = {
+        crowd: null,
+        laugh: null,
+        abductVocal: null,
+        ufoBeam: null
+      };
+
+      const preloadedAudioElements = {
+        crowd: [],
+        laugh: [],
+        abductVocal: [],
+        ufoBeam: []
+      };
+
+      let audioCtx = null;
+      let isMuted = false;
+      let masterVolume = 0.85;
+      let ufoGainRatio = 0.65;
+      let audioUnlocked = false;
+      let activeHtmlAudios = [];
+      let demoMixTimeouts = [];
+
+      function getAudioContext() {
+        if (!audioCtx) {
+          const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+          if (AudioContextClass) {
+            audioCtx = new AudioContextClass();
+          }
+        }
+        return audioCtx;
+      }
+
+      function preloadRealAudio() {
+        Object.keys(REAL_AUDIO_SOURCES).forEach((key) => {
+          preloadedAudioElements[key] = REAL_AUDIO_SOURCES[key].map((url) => {
+            try {
+              const a = new Audio();
+              a.crossOrigin = 'anonymous';
+              a.preload = 'auto';
+              a.src = url;
+              return a;
+            } catch (err) {
+              return null;
+            }
+          }).filter(Boolean);
+        });
+      }
+
+      function unlockAudioOnUserGesture() {
+        const ctx = getAudioContext();
+        if (ctx && ctx.state === 'suspended') {
+          ctx.resume().then(() => {
+            audioUnlocked = true;
+            updateAudioStatusUI();
+          }).catch(() => {});
+        } else if (ctx && ctx.state === 'running') {
+          audioUnlocked = true;
+        }
+        // Play a tiny silent buffer to unlock iOS Safari WebAudio & HTML5 Audio
+        if (ctx && !audioUnlocked) {
+          try {
+            const buffer = ctx.createBuffer(1, 1, 22050);
+            const source = ctx.createBufferSource();
+            source.buffer = buffer;
+            source.connect(ctx.destination);
+            source.start(0);
+            audioUnlocked = true;
+          } catch (e) {}
+        }
+        updateAudioStatusUI();
+      }
+
+      function updateAudioStatusUI() {
+        const banner = document.getElementById('audioUnlockBanner');
+        const dot = document.getElementById('audioWaveDot');
+        const txt = document.getElementById('audioStatusText');
+        const iconMute = document.getElementById('iconMuteState');
+
+        if (isMuted || masterVolume === 0) {
+          iconMute.textContent = '🔇';
+          dot.className = 'w-2 h-2 rounded-full bg-rose-400';
+          txt.textContent = 'Âm thanh: Đang tắt tiếng';
+          if (banner) banner.classList.add('hidden');
+          return;
+        }
+
+        iconMute.textContent = masterVolume < 0.4 ? '🔉' : '🔊';
+        const ctx = getAudioContext();
+        if (ctx && ctx.state === 'suspended') {
+          dot.className = 'w-2 h-2 rounded-full bg-amber-400 animate-pulse';
+          txt.textContent = 'Âm thanh: Chạm màn hình để bật tiếng';
+          if (banner) banner.classList.remove('hidden');
+        } else {
+          dot.className = 'w-2 h-2 rounded-full bg-emerald-400';
+          txt.textContent = 'Âm thanh: Chỉ bật tiếng UFO & Tia hút';
+          if (banner) banner.classList.add('hidden');
+        }
+      }
+
+      function stopAllActiveAudio() {
+        demoMixTimeouts.forEach((t) => clearTimeout(t));
+        demoMixTimeouts = [];
+        activeHtmlAudios.forEach((a) => {
+          try {
+            a.pause();
+            a.currentTime = 0;
+          } catch (e) {}
+        });
+        activeHtmlAudios = [];
+      }
+
+      /**
+       * Helper: Plays a custom user-uploaded audio clip (or UFO beam clip)
+       */
+      function playRealClipLayer(layerKey, options = {}) {
+        if (isMuted || masterVolume <= 0) return;
+        const volScale = options.volume !== undefined ? options.volume : 0.7;
+        const maxDurationMs = options.maxDurationMs || 3800;
+        const playbackRate = options.playbackRate || 1.0;
+        const offsetSec = options.offsetSec || 0;
+
+        let srcUrl = customAudioBlobs[layerKey];
+        if (!srcUrl) {
+          const list = REAL_AUDIO_SOURCES[layerKey] || [];
+          if (list.length > 0) {
+            const idx = options.clipIndex !== undefined ? (options.clipIndex % list.length) : Math.floor(Math.random() * list.length);
+            srcUrl = list[idx];
+          }
+        }
+        if (!srcUrl) return;
+
+        try {
+          const audio = new Audio(srcUrl);
+          audio.volume = Math.min(1, Math.max(0, masterVolume * volScale));
+          audio.playbackRate = playbackRate;
+          if (offsetSec > 0) {
+            audio.currentTime = offsetSec;
+          }
+          activeHtmlAudios.push(audio);
+
+          const playPromise = audio.play();
+          if (playPromise && typeof playPromise.catch === 'function') {
+            playPromise.catch(() => {});
+          }
+
+          if (maxDurationMs) {
+            const fadeOutTime = Math.max(200, maxDurationMs - 400);
+            const t1 = setTimeout(() => {
+              try {
+                audio.volume = Math.max(0, audio.volume * 0.35);
+              } catch (e) {}
+            }, fadeOutTime);
+            const t2 = setTimeout(() => {
+              try {
+                audio.pause();
+              } catch (e) {}
+            }, maxDurationMs);
+            demoMixTimeouts.push(t1, t2);
+          }
+        } catch (err) {}
+      }
+
+      /**
+       * Phase 1 Audio (CHASING): UFO Hover Hum Only
+       * (Student crowd audio only plays if user manually uploads a file later)
+       */
+      function triggerCrowdChaseAudio(durationSec = 3.5) {
+        unlockAudioOnUserGesture();
+        if (isMuted || masterVolume <= 0) return;
+
+        if (customAudioBlobs.crowd) {
+          playRealClipLayer('crowd', {
+            volume: 0.75,
+            maxDurationMs: durationSec * 1000
+          });
+        }
+
+        const ctx = getAudioContext();
+        if (!ctx) return;
+        playGentleUfoHover(ctx, durationSec);
+      }
+
+      /**
+       * UFO Hover Hum (Sci-fi sine wave with 6.5Hz wobble)
+       */
+      function playGentleUfoHover(ctx, durationSec = 3.2) {
+        if (!ctx || isMuted || masterVolume <= 0) return;
+        if (customAudioBlobs.ufoBeam) {
+          playRealClipLayer('ufoBeam', { volume: ufoGainRatio, maxDurationMs: durationSec * 1000 });
+          return;
+        }
+        const now = ctx.currentTime;
+        const osc = ctx.createOscillator();
+        const lfo = ctx.createOscillator();
+        const lfoGain = ctx.createGain();
+        const mainGain = ctx.createGain();
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(240, now);
+
+        lfo.type = 'sine';
+        lfo.frequency.setValueAtTime(6.5, now); // Cute sci-fi wobble
+        lfoGain.gain.setValueAtTime(35, now);
+
+        const targetGain = Math.max(0.015, masterVolume * ufoGainRatio * 0.38);
+        mainGain.gain.setValueAtTime(0.001, now);
+        mainGain.gain.linearRampToValueAtTime(targetGain, now + 0.25);
+        mainGain.gain.setValueAtTime(targetGain, now + Math.max(0.3, durationSec - 0.3));
+        mainGain.gain.exponentialRampToValueAtTime(0.0001, now + durationSec);
+
+        lfo.connect(lfoGain);
+        lfoGain.connect(osc.frequency);
+        osc.connect(mainGain);
+        mainGain.connect(ctx.destination);
+
+        osc.start(now);
+        lfo.start(now);
+        osc.stop(now + durationSec + 0.05);
+        lfo.stop(now + durationSec + 0.05);
+      }
+
+      /**
+       * Phase 2 Audio (ABDUCTING): UFO Tractor Beam & Result Chime Only
+       * (Student vocal/laugh audio only plays if user manually uploads files later)
+       */
+      function triggerAbductionAndGroupLaughAudio() {
+        unlockAudioOnUserGesture();
+        if (isMuted || masterVolume <= 0) return;
+
+        if (customAudioBlobs.abductVocal) {
+          playRealClipLayer('abductVocal', { volume: 0.8, maxDurationMs: 2800 });
+        }
+        if (customAudioBlobs.laugh) {
+          const tLaugh = setTimeout(() => {
+            playRealClipLayer('laugh', { volume: 0.85, maxDurationMs: 3000 });
+          }, 350);
+          demoMixTimeouts.push(tLaugh);
+        }
+
+        const ctx = getAudioContext();
+        if (!ctx) return;
+
+        // UFO Hover + Shimmering Tractor Beam Chime & Victory Fanfare
+        playGentleUfoHover(ctx, 2.5);
+        playTractorBeamAndVictoryChime(ctx);
+      }
+
+      /**
+       * Magical Tractor Beam + Cheerful Result Bell Arpeggio
+       */
+      function playTractorBeamAndVictoryChime(ctx) {
+        if (!ctx || isMuted || masterVolume <= 0) return;
+        const now = ctx.currentTime;
+        const beamNotes = [523.25, 659.25, 783.99, 1046.50, 1318.51, 1567.98]; // C5 major pentatonic sparkle
+        const gainScale = Math.max(0.025, masterVolume * ufoGainRatio * 0.45);
+
+        beamNotes.forEach((freq, idx) => {
+          const osc = ctx.createOscillator();
+          const g = ctx.createGain();
+          osc.type = 'sine';
+          const startT = now + idx * 0.14;
+          osc.frequency.setValueAtTime(freq, startT);
+          g.gain.setValueAtTime(0.0001, startT);
+          g.gain.linearRampToValueAtTime(gainScale, startT + 0.04);
+          g.gain.exponentialRampToValueAtTime(0.0001, startT + 0.45);
+          osc.connect(g);
+          g.connect(ctx.destination);
+          osc.start(startT);
+          osc.stop(startT + 0.48);
+        });
+
+        // Happy Result Fanfare Chord (C5 - E5 - G5 - C6)
+        const fanfare = [523.25, 659.25, 783.99, 1046.50];
+        fanfare.forEach((freq, idx) => {
+          const osc = ctx.createOscillator();
+          const g = ctx.createGain();
+          osc.type = 'triangle';
+          const startT = now + 1.15 + idx * 0.07;
+          osc.frequency.setValueAtTime(freq, startT);
+          g.gain.setValueAtTime(0.0001, startT);
+          g.gain.linearRampToValueAtTime(gainScale * 1.15, startT + 0.03);
+          g.gain.exponentialRampToValueAtTime(0.0001, startT + 0.65);
+          osc.connect(g);
+          g.connect(ctx.destination);
+          osc.start(startT);
+          osc.stop(startT + 0.7);
+        });
+      }
+
+      /**
+       * Quick Preview of UFO Flight + Tractor Beam & Result Chime
+       */
+      function playShortEvaluationMix() {
+        unlockAudioOnUserGesture();
+        stopAllActiveAudio();
+
+        const progressBar = document.getElementById('demoMixProgressBar');
+        const statusEl = document.getElementById('demoMixStepStatus');
+        const btnText = document.getElementById('txtPlayFullDemoMix');
+
+        if (btnText) btnText.textContent = 'Đang phát âm thanh UFO...';
+        if (statusEl) statusEl.textContent = '🛸 [0.0s - 2.0s] Âm UFO bay lượn truy tìm mục tiêu...';
+        if (progressBar) progressBar.style.width = '25%';
+
+        triggerCrowdChaseAudio(2.0);
+
+        const tProg1 = setTimeout(() => {
+          if (progressBar) progressBar.style.width = '55%';
+        }, 1000);
+
+        const tPhase2 = setTimeout(() => {
+          if (progressBar) progressBar.style.width = '80%';
+          if (statusEl) statusEl.textContent = '🔦 [2.0s - 4.0s] Tia hút UFO & Chuông công bố kết quả!';
+          triggerAbductionAndGroupLaughAudio();
+        }, 2000);
+
+        const tEnd = setTimeout(() => {
+          if (progressBar) progressBar.style.width = '100%';
+          if (statusEl) statusEl.textContent = '✅ Đã phát xong âm thanh UFO! (Âm thanh học sinh đang để trống để anh tự thêm sau).';
+          if (btnText) btnText.textContent = 'Nghe thử lại âm UFO';
+        }, 4000);
+
+        demoMixTimeouts.push(tProg1, tPhase2, tEnd);
+      }
+
+      // =========================================================================
+      // 3. CHIBI STUDENT & UFO ENTITIES (2D CANVAS ANIMATION)
+      // =========================================================================
+      const canvas = document.getElementById('gameCanvas');
+      const ctx2d = canvas.getContext('2d');
+      let cw = 1000;
+      let ch = 650;
+
+      let studentEntities = [];
+      let hatchSparkles = [];
+      const ufo = {
+        x: 500,
+        y: 115,
+        targetX: 500,
+        targetY: 115,
+        vx: 0,
+        vy: 0,
+        tilt: 0,
+        beamProgress: 0,
+        searchBeamAlpha: 0,
+        swallowBounce: 0,
+        capturedStudent: null,
+        alienMood: 'happy', // 'happy' | 'mischievous' | 'excited'
+        lightPhase: 0
+      };
+
+      function hashString(str) {
+        let h = 2166136261;
+        for (let i = 0; i < str.length; i++) {
+          h ^= str.charCodeAt(i);
+          h = Math.imul(h, 16777619);
+        }
+        return Math.abs(h);
+      }
+
+      function createStudentEntity(name, index, total) {
+        const seed = hashString(name + '_' + index);
+        const shirtColor = PASTEL_SHIRTS[seed % PASTEL_SHIRTS.length];
+        const pantsColor = PASTEL_PANTS[(seed >> 3) % PASTEL_PANTS.length];
+        const hairColor = HAIR_COLORS[(seed >> 5) % HAIR_COLORS.length];
+        const shoeColor = SHOE_COLORS[(seed >> 7) % SHOE_COLORS.length];
+        const hairStyle = seed % 5; // 0: spiky, 1: twin pigtails, 2: bob + bow, 3: curly puff, 4: side part
+        const accessory = (seed >> 4) % 5; // 0: none, 1: round glasses, 2: yellow cap, 3: sprout clip, 4: ribbon
+
+        // Spread nicely across the schoolyard grass area
+        const minX = 80;
+        const maxX = Math.max(200, cw - 80);
+        const minY = Math.max(240, ch * 0.48);
+        const maxY = Math.max(320, ch - 85);
+
+        const cols = Math.max(3, Math.ceil(Math.sqrt(total * 1.6)));
+        const rows = Math.max(2, Math.ceil(total / cols));
+        const col = index % cols;
+        const row = Math.floor(index / cols);
+
+        const cellW = (maxX - minX) / cols;
+        const cellH = (maxY - minY) / rows;
+
+        const startX = minX + col * cellW + cellW * 0.5 + ((seed % 25) - 12);
+        const startY = minY + row * cellH + cellH * 0.5 + (((seed >> 2) % 20) - 10);
+
+        const angle = (seed % 360) * (Math.PI / 180);
+        const baseSpeed = 42 + (seed % 28);
+
+        return {
+          id: index + '_' + name,
+          name: name,
+          x: Math.max(minX, Math.min(maxX, startX)),
+          y: Math.max(minY, Math.min(maxY, startY)),
+          z: 0, // Height off the ground (for jumping & UFO abduction!)
+          abductAnchorX: Math.max(minX, Math.min(maxX, startX)),
+          abductAnchorY: Math.max(minY, Math.min(maxY, startY)),
+          shoeDropped: false,
+          suckedIn: false,
+          vx: Math.cos(angle) * baseSpeed,
+          vy: Math.sin(angle) * baseSpeed * 0.6,
+          baseSpeed: baseSpeed,
+          facing: Math.cos(angle) >= 0 ? 1 : -1,
+          walkPhase: (seed % 100) * 0.1,
+          jumpTimer: (seed % 50) * 0.1,
+          lookAroundTimer: (seed % 40) * 0.1,
+          rotation: 0,
+          scale: 1,
+          hasLeftShoe: true,
+          hasRightShoe: true,
+          shirtColor,
+          pantsColor,
+          hairColor,
+          shoeColor,
+          hairStyle,
+          accessory,
+          speechText: '',
+          speechTimer: 0,
+          expression: 'normal', // 'normal' | 'panic_fun' | 'abducted' | 'cheer'
+          labelX: startX,
+          labelY: startY + 26
+        };
+      }
+
+      function rebuildSchoolyardEntities() {
+        const availableNames = getAvailableStudents();
+        studentEntities = availableNames.map((name, idx) =>
+          createStudentEntity(name, idx, availableNames.length)
+        );
+        updateTopCountersUI();
+      }
+
+      function syncSchoolyardEntitiesWithoutTeleport() {
+        const availableNames = getAvailableStudents();
+        const availSet = new Set(availableNames);
+        // Keep existing entities that are still available in their current yard positions
+        studentEntities = studentEntities.filter((st) => availSet.has(st.name));
+        const existingNames = new Set(studentEntities.map((st) => st.name));
+        availableNames.forEach((name, idx) => {
+          if (!existingNames.has(name)) {
+            studentEntities.push(createStudentEntity(name, idx, availableNames.length));
+          }
+        });
+        studentEntities.forEach((st) => {
+          st.z = 0;
+          st.scale = 1;
+          st.rotation = 0;
+          st.expression = 'normal';
+          st.hasLeftShoe = true;
+          st.hasRightShoe = true;
+          st.shoeDropped = false;
+          st.suckedIn = false;
+        });
+        updateTopCountersUI();
+      }
+
+      function getAvailableStudents() {
+        if (!noRepeatMode) {
+          return [...allStudentNames];
+        }
+        const calledSet = new Set(calledStudentNames);
+        return allStudentNames.filter((n) => !calledSet.has(n));
+      }
+
+      function initCloudsAndBirds() {
+        clouds = [];
+        for (let i = 0; i < 6; i++) {
+          clouds.push({
+            x: Math.random() * 1200,
+            y: 35 + (i % 3) * 38,
+            scale: 0.65 + (i % 3) * 0.22,
+            speed: 8 + (i % 4) * 4
+          });
+        }
+        birds = [];
+        for (let i = 0; i < 4; i++) {
+          birds.push({
+            x: Math.random() * 1000,
+            y: 55 + i * 25,
+            speed: 28 + i * 7,
+            wingPhase: i * 1.4
+          });
+        }
+      }
+
+      function spawnHatchCaptureBurst(x, y) {
+        const colors = ['#FEF08A', '#67E8F9', '#F472B6', '#A7F3D0', '#FDE047'];
+        for (let i = 0; i < 20; i++) {
+          const ang = (i / 20) * Math.PI * 2;
+          const spd = 65 + Math.random() * 95;
+          hatchSparkles.push({
+            x,
+            y,
+            vx: Math.cos(ang) * spd,
+            vy: Math.sin(ang) * spd * 0.65,
+            r: 3.5 + Math.random() * 3.5,
+            color: colors[i % colors.length],
+            life: 0.55 + Math.random() * 0.25,
+            maxLife: 0.8
+          });
+        }
+      }
+
+      // =========================================================================
+      // 4. FAIR RANDOM PICKER & GAMEPLAY FLOW
+      // =========================================================================
+      function pickFairRandomIndex(maxExclusive) {
+        if (maxExclusive <= 1) return 0;
+        if (window.crypto && window.crypto.getRandomValues) {
+          const arr = new Uint32Array(1);
+          window.crypto.getRandomValues(arr);
+          return arr[0] % maxExclusive;
+        }
+        return Math.floor(Math.random() * maxExclusive);
+      }
+
+      function startCatchSequence() {
+        unlockAudioOnUserGesture();
+        if (gameState === 'CHASING' || gameState === 'ABDUCTING') return;
+
+        // Hide winner modal if open
+        document.getElementById('winnerOverlay').classList.add('hidden');
+
+        // If all students have been called in no-repeat mode, automatically start a fresh round
+        let available = getAvailableStudents();
+        if (available.length === 0 && allStudentNames.length > 0) {
+          calledStudentNames = [];
+          ufo.capturedStudent = null;
+          saveStateToStorage();
+          rebuildSchoolyardEntities();
+          renderCalledHistoryList();
+          available = getAvailableStudents();
+        } else {
+          syncSchoolyardEntitiesWithoutTeleport();
+        }
+
+        if (studentEntities.length === 0) {
+          rebuildSchoolyardEntities();
+        }
+        if (studentEntities.length === 0) return;
+
+        // Fairly pick the winner right away, and build 4-5 decoy feint targets for UFO suspense
+        const winnerIdx = pickFairRandomIndex(studentEntities.length);
+        chosenStudent = studentEntities[winnerIdx];
+
+        ufoFeintTargets = [];
+        const numFeints = Math.min(5, Math.max(3, studentEntities.length));
+        for (let i = 0; i < numFeints; i++) {
+          const randStudent = studentEntities[pickFairRandomIndex(studentEntities.length)];
+          ufoFeintTargets.push(randStudent);
+        }
+        ufoFeintTargets.push(chosenStudent);
+        currentFeintIndex = 0;
+
+        gameState = 'CHASING';
+        stateTimer = 0;
+        chaseDuration = 3.5; // 3.5 seconds of lively chase
+        ufo.alienMood = 'mischievous';
+        ufo.beamProgress = 0;
+        ufo.capturedStudent = null;
+
+        // Give several random students funny chase speech bubbles
+        studentEntities.forEach((st) => {
+          st.expression = 'panic_fun';
+          st.hasLeftShoe = true;
+          st.hasRightShoe = true;
+          st.shoeDropped = false;
+          st.suckedIn = false;
+          st.z = 0;
+          st.rotation = 0;
+          st.scale = 1;
+          const ang = Math.random() * Math.PI * 2;
+          st.vx = Math.cos(ang) * st.baseSpeed * 2.35;
+          st.vy = Math.sin(ang) * st.baseSpeed * 1.85;
+          if (Math.random() < 0.42) {
+            st.speechText = CHASE_EXCLAMATIONS[Math.floor(Math.random() * CHASE_EXCLAMATIONS.length)];
+            st.speechTimer = 1.6 + Math.random() * 1.5;
+          } else {
+            st.speechText = '';
+          }
+        });
+
+        updatePhaseBanner(
+          '🏃‍♂️💨',
+          'Cả lớp đang chạy trốn nhốn nháo!',
+          'UFO đang đảo hướng truy tìm xem ai sẽ lên bảng trả bài...'
+        );
+        const btnCatch = document.getElementById('btnTriggerCatch');
+        const btnCatchText = document.getElementById('btnTriggerCatchText');
+        btnCatch.disabled = true;
+        btnCatchText.textContent = 'UFO đang truy tìm...';
+
+        // Trigger chase sound mix!
+        triggerCrowdChaseAudio(chaseDuration);
+      }
+
+      function transitionToAbducting() {
+        gameState = 'ABDUCTING';
+        stateTimer = 0;
+        ufo.alienMood = 'excited';
+        ufo.searchBeamAlpha = 0;
+
+        if (!chosenStudent && studentEntities.length > 0) {
+          chosenStudent = studentEntities[0];
+        }
+
+        if (chosenStudent) {
+          chosenStudent.expression = 'abducted';
+          chosenStudent.abductAnchorX = chosenStudent.x;
+          chosenStudent.abductAnchorY = chosenStudent.y;
+          chosenStudent.shoeDropped = false;
+          chosenStudent.suckedIn = false;
+          chosenStudent.speechText = 'Áaaa! Đừng bắt em! 🛸';
+          chosenStudent.speechTimer = 2.6;
+        }
+
+        // Other students stop panicking and cheer / laugh / jump!
+        studentEntities.forEach((st) => {
+          if (st !== chosenStudent) {
+            st.expression = 'cheer';
+            st.vx *= 0.18;
+            st.vy *= 0.18;
+            if (Math.random() < 0.45) {
+              st.speechText = BYSTANDER_CHEERS[Math.floor(Math.random() * BYSTANDER_CHEERS.length)];
+              st.speechTimer = 2.8;
+            } else {
+              st.speechText = '';
+            }
+          }
+        });
+
+        updatePhaseBanner(
+          '🔦✨',
+          `Tia sáng UFO đang hút bạn ${chosenStudent ? chosenStudent.name : ''} lên tàu!`,
+          'Ối! Bạn ấy đang nhỏ dần và bị hút tọt vào khoang đĩa bay rồi!'
+        );
+
+        // Trigger abduction sound & group laughter!
+        triggerAbductionAndGroupLaughAudio();
+      }
+
+      function transitionToResultModal() {
+        gameState = 'RESULT';
+        stateTimer = 0;
+
+        const btnCatch = document.getElementById('btnTriggerCatch');
+        const btnCatchText = document.getElementById('btnTriggerCatchText');
+        btnCatch.disabled = false;
+        btnCatchText.textContent = 'Bắt một bạn nào!';
+
+        if (!chosenStudent) return;
+
+        // Always record in called history list for the round
+        if (!calledStudentNames.includes(chosenStudent.name)) {
+          calledStudentNames.push(chosenStudent.name);
+          saveStateToStorage();
+        }
+
+        document.getElementById('lastCalledMini').textContent = chosenStudent.name;
+        renderCalledHistoryList();
+        updateTopCountersUI();
+
+        // Populate & show winner celebration modal
+        document.getElementById('winnerStudentName').textContent = chosenStudent.name;
+        document.getElementById('winnerFunnyQuote').textContent =
+          FUNNY_QUOTES[Math.floor(Math.random() * FUNNY_QUOTES.length)];
+
+        drawWinnerAvatarPortrait(chosenStudent);
+        spawnCelebrationConfetti();
+
+        document.getElementById('winnerOverlay').classList.remove('hidden');
+        updatePhaseBanner(
+          '🎉🌟',
+          `Mời bạn ${chosenStudent.name} lên bảng trả bài!`,
+          'Nhấn nút "Tiếp tục" hoặc phím SPACE để gọi bạn tiếp theo nhé!'
+        );
+      }
+
+      function updatePhaseBanner(emoji, title, desc) {
+        document.getElementById('livePhaseEmoji').textContent = emoji;
+        document.getElementById('livePhaseTitle').textContent = title;
+        document.getElementById('livePhaseDesc').textContent = desc;
+      }
+
+      // =========================================================================
+      // 5. PHYSICS, ANTI-OVERLAP LABELS & ANIMATION UPDATE LOOP
+      // =========================================================================
+      function resizeCanvas() {
+        const container = document.getElementById('stageContainer');
+        if (!container) return;
+        const rect = container.getBoundingClientRect();
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        cw = Math.max(320, rect.width);
+        ch = Math.max(420, rect.height);
+        canvas.width = cw * dpr;
+        canvas.height = ch * dpr;
+        ctx2d.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+        // Keep students inside new yard boundaries
+        const minX = 65;
+        const maxX = Math.max(150, cw - 65);
+        const minY = Math.max(220, ch * 0.47);
+        const maxY = Math.max(300, ch - 85);
+
+        studentEntities.forEach((st) => {
+          st.x = Math.max(minX, Math.min(maxX, st.x));
+          st.y = Math.max(minY, Math.min(maxY, st.y));
+        });
+      }
+
+      function updateGame(dt) {
+        stateTimer += dt;
+        ufo.lightPhase += dt * 7;
+        if (ufo.swallowBounce > 0) {
+          ufo.swallowBounce = Math.max(0, ufo.swallowBounce - dt * 2.4);
+        }
+
+        // Update drifting clouds & birds
+        clouds.forEach((c) => {
+          c.x += c.speed * dt;
+          if (c.x > cw + 140) c.x = -140;
+        });
+        birds.forEach((b) => {
+          b.x += b.speed * dt;
+          b.wingPhase += dt * 9;
+          if (b.x > cw + 80) b.x = -80;
+        });
+
+        // Yard boundaries for students
+        const minX = 65;
+        const maxX = Math.max(150, cw - 65);
+        const minY = Math.max(220, ch * 0.47);
+        const maxY = Math.max(300, ch - 88);
+
+        // Ideal sky altitude for the UFO (stays high in the sky like ufo-only!)
+        const skyUfoY = Math.max(85, Math.min(140, ch * 0.18));
+
+        // STATE MACHINE LOGIC
+        if (gameState === 'IDLE') {
+          // UFO cruises smoothly in a figure-8 over the schoolyard
+          const t = performance.now() * 0.0008;
+          ufo.targetX = cw * 0.5 + Math.sin(t) * Math.min(290, cw * 0.33);
+          ufo.targetY = skyUfoY + Math.cos(t * 2) * 14;
+          ufo.beamProgress = Math.max(0, ufo.beamProgress - dt * 3.5);
+          ufo.searchBeamAlpha = Math.max(0, ufo.searchBeamAlpha - dt * 3);
+        } else if (gameState === 'CHASING') {
+          // UFO darts rapidly between feint targets, then locks right over chosenStudent in the final 1.0s
+          const progress = Math.min(1, stateTimer / chaseDuration);
+          ufo.searchBeamAlpha = Math.min(1, ufo.searchBeamAlpha + dt * 4);
+          let targetSt = chosenStudent;
+          if (progress < 0.72 && ufoFeintTargets.length > 0) {
+            const idx = Math.min(
+              ufoFeintTargets.length - 1,
+              Math.floor((progress / 0.72) * (ufoFeintTargets.length - 1))
+            );
+            targetSt = ufoFeintTargets[idx] || chosenStudent;
+          }
+          if (targetSt) {
+            ufo.targetX = targetSt.x;
+            ufo.targetY = Math.min(skyUfoY, targetSt.y - 190) + Math.sin(stateTimer * 9) * 6;
+          }
+          // In the last 0.8s of chase, gently slow down chosenStudent so UFO locks cleanly over them
+          if (progress > 0.76 && chosenStudent) {
+            chosenStudent.vx *= Math.pow(0.15, dt);
+            chosenStudent.vy *= Math.pow(0.15, dt);
+          }
+          if (stateTimer >= chaseDuration) {
+            transitionToAbducting();
+          }
+        } else if (gameState === 'ABDUCTING') {
+          ufo.searchBeamAlpha = 0;
+          const liftDuration = 2.50;
+          const totalAbductDuration = 2.95;
+
+          if (chosenStudent) {
+            // Keep UFO hovering steadily high in the sky directly over the abduction spot
+            ufo.targetX = chosenStudent.abductAnchorX;
+            ufo.targetY = Math.min(skyUfoY, chosenStudent.abductAnchorY - 195) + Math.sin(stateTimer * 9) * 4;
+
+            // Smoothly pull UFO X directly over anchor
+            const rawLift = Math.min(1, stateTimer / liftDuration);
+            // Smooth easing: brief lock-on, then steady accelerating climb right into UFO nozzle
+            const easeLift = rawLift < 0.10
+              ? (rawLift / 0.10) * 0.05
+              : 0.05 + Math.pow((rawLift - 0.10) / 0.90, 1.15) * 0.95;
+
+            if (stateTimer < liftDuration) {
+              ufo.beamProgress = Math.min(1, ufo.beamProgress + dt * 5.5);
+            } else {
+              // Retract tractor beam after student is sucked inside the UFO!
+              ufo.beamProgress = Math.max(0, 1 - (stateTimer - liftDuration) / 0.35);
+            }
+
+            // Total vertical climb from student's ground spot right into the UFO bottom hatch (ufo.y + 4)
+            const totalClimb = Math.max(150, chosenStudent.abductAnchorY - (ufo.y + 4));
+            chosenStudent.y = chosenStudent.abductAnchorY;
+            chosenStudent.z = easeLift * totalClimb;
+
+            // Pull student horizontally into the center of the UFO beam with a playful mid-air sway
+            const sway = Math.sin(stateTimer * 13) * (1 - easeLift) * 9;
+            chosenStudent.x = chosenStudent.abductAnchorX +
+              (ufo.x - chosenStudent.abductAnchorX) * Math.min(1, rawLift * 2.8) + sway;
+
+            // Comical mid-air wobble & spin as they get sucked into the hatch
+            chosenStudent.rotation = Math.sin(stateTimer * 14) * 0.24 +
+              (easeLift > 0.75 ? ((easeLift - 0.75) / 0.25) * 0.55 : 0);
+
+            // Progressive shrinking: shrinks smoothly along the beam cone (1.0 -> 0.42), then shrinks into the UFO hatch (0.42 -> 0.0)!
+            if (easeLift < 0.80) {
+              chosenStudent.scale = 1.0 - (easeLift / 0.80) * 0.58; // 1.0 -> 0.42
+            } else if (easeLift < 0.97) {
+              chosenStudent.scale = 0.42 * (1 - (easeLift - 0.80) / 0.17); // 0.42 -> 0.0
+            } else {
+              chosenStudent.scale = 0;
+            }
+
+            // Drop 1 shoe in mid-air at ~0.42s (just like ufo-only!) so the shoe visibly tumbles from the sky to the lawn
+            if (!chosenStudent.shoeDropped && stateTimer >= 0.42) {
+              chosenStudent.shoeDropped = true;
+              chosenStudent.hasRightShoe = false;
+              droppedShoes.push({
+                x: chosenStudent.x + 12,
+                y: chosenStudent.y - chosenStudent.z + 8,
+                vy: -95,
+                vx: 42 + Math.random() * 25,
+                rot: 0.2,
+                vRot: 10.5,
+                color: chosenStudent.shoeColor,
+                groundY: chosenStudent.abductAnchorY + 14,
+                alpha: 1
+              });
+            }
+
+            // Trigger hatch swallow effect when student enters the UFO nozzle!
+            if (!chosenStudent.suckedIn && easeLift >= 0.94) {
+              chosenStudent.suckedIn = true;
+              chosenStudent.scale = 0;
+              ufo.swallowBounce = 1.0;
+              ufo.capturedStudent = chosenStudent;
+              spawnHatchCaptureBurst(ufo.x, ufo.y + 14);
+            }
+          }
+
+          if (stateTimer >= totalAbductDuration) {
+            transitionToResultModal();
+          }
+        } else if (gameState === 'RESULT') {
+          ufo.beamProgress = Math.max(0, ufo.beamProgress - dt * 3.5);
+          ufo.searchBeamAlpha = 0;
+          ufo.targetY = skyUfoY + Math.sin(stateTimer * 3) * 8;
+        }
+
+        // Smooth UFO movement & tilt
+        const ufoSpring = gameState === 'CHASING' ? 9.5 : (gameState === 'ABDUCTING' ? 7.5 : 4.2);
+        const dxUfo = ufo.targetX - ufo.x;
+        const dyUfo = ufo.targetY - ufo.y;
+        ufo.vx = dxUfo * ufoSpring;
+        ufo.vy = dyUfo * ufoSpring;
+        ufo.x += ufo.vx * dt;
+        ufo.y += ufo.vy * dt;
+        ufo.tilt = Math.max(-0.28, Math.min(0.28, ufo.vx * 0.00085));
+
+        // Update Students movement & soft separation so characters don't clump
+        const n = studentEntities.length;
+        for (let i = 0; i < n; i++) {
+          const st = studentEntities[i];
+
+          if (st.speechTimer > 0) {
+            st.speechTimer -= dt;
+            if (st.speechTimer <= 0) st.speechText = '';
+          }
+
+          if (gameState === 'ABDUCTING' && st === chosenStudent) {
+            st.walkPhase += dt * 22; // Rapid comical flailing!
+            continue;
+          }
+          if (gameState === 'RESULT' && st === chosenStudent) {
+            continue;
+          }
+
+          // Soft separation force from nearby classmates
+          let sepX = 0;
+          let sepY = 0;
+          for (let j = 0; j < n; j++) {
+            if (i === j) continue;
+            const other = studentEntities[j];
+            if ((gameState === 'ABDUCTING' || gameState === 'RESULT') && other === chosenStudent) continue;
+            const dx = st.x - other.x;
+            const dy = st.y - other.y;
+            const distSq = dx * dx + dy * dy;
+            const minDist = 54;
+            if (distSq > 0.1 && distSq < minDist * minDist) {
+              const dist = Math.sqrt(distSq);
+              const push = (minDist - dist) / minDist;
+              sepX += (dx / dist) * push * 85;
+              sepY += (dy / dist) * push * 65;
+            }
+          }
+
+          if (gameState === 'CHASING') {
+            // Scatter away from UFO scanning spot!
+            const scanY = Math.min(maxY, Math.max(minY, ufo.y + 220));
+            const dxFromUfo = st.x - ufo.x;
+            const dyFromUfo = st.y - scanY;
+            const dUfo = Math.sqrt(dxFromUfo * dxFromUfo + dyFromUfo * dyFromUfo);
+            if (dUfo < 145 && dUfo > 1) {
+              sepX += (dxFromUfo / dUfo) * 165;
+              sepY += (dyFromUfo / dUfo) * 115;
+            }
+          }
+
+          st.x += (st.vx + sepX) * dt;
+          st.y += (st.vy + sepY) * dt;
+
+          // Bounce off schoolyard boundaries
+          if (st.x < minX) { st.x = minX; st.vx = Math.abs(st.vx); }
+          if (st.x > maxX) { st.x = maxX; st.vx = -Math.abs(st.vx); }
+          if (st.y < minY) { st.y = minY; st.vy = Math.abs(st.vy); }
+          if (st.y > maxY) { st.y = maxY; st.vy = -Math.abs(st.vy); }
+
+          if (Math.abs(st.vx) > 2) {
+            st.facing = st.vx >= 0 ? 1 : -1;
+          }
+
+          const speedMult = gameState === 'CHASING' ? 15 : (gameState === 'ABDUCTING' ? 9 : 7);
+          st.walkPhase += dt * speedMult;
+
+          // Random cute hops in IDLE or CHEER state
+          st.jumpTimer -= dt;
+          if (st.jumpTimer <= 0) {
+            st.jumpTimer = gameState === 'ABDUCTING' ? (0.4 + Math.random() * 0.5) : (2.2 + Math.random() * 3.5);
+          }
+          if (gameState === 'ABDUCTING' && st !== chosenStudent) {
+            st.z = Math.abs(Math.sin(st.walkPhase * 0.8)) * 14;
+          } else if (gameState === 'IDLE') {
+            st.z = st.jumpTimer < 0.35 ? Math.sin((st.jumpTimer / 0.35) * Math.PI) * 12 : 0;
+            // Occasionally change strolling direction
+            st.lookAroundTimer -= dt;
+            if (st.lookAroundTimer <= 0) {
+              st.lookAroundTimer = 2.0 + Math.random() * 2.5;
+              const newAng = Math.random() * Math.PI * 2;
+              st.vx = Math.cos(newAng) * st.baseSpeed;
+              st.vy = Math.sin(newAng) * st.baseSpeed * 0.65;
+            }
+          }
+        }
+
+        // Update Dropped Shoe physics
+        for (let i = droppedShoes.length - 1; i >= 0; i--) {
+          const sh = droppedShoes[i];
+          sh.x += sh.vx * dt;
+          sh.y += sh.vy * dt;
+          sh.vy += 460 * dt; // Gravity
+          sh.rot += sh.vRot * dt;
+          if (sh.y >= sh.groundY) {
+            sh.y = sh.groundY;
+            sh.vy = -sh.vy * 0.38;
+            sh.vx *= 0.62;
+            sh.vRot *= 0.5;
+          }
+        }
+        if (droppedShoes.length > 5) droppedShoes.shift();
+
+        // Update Hatch Capture Sparkles
+        for (let i = hatchSparkles.length - 1; i >= 0; i--) {
+          const sp = hatchSparkles[i];
+          sp.x += sp.vx * dt;
+          sp.y += sp.vy * dt;
+          sp.life -= dt;
+          if (sp.life <= 0) hatchSparkles.splice(i, 1);
+        }
+
+        // Update Confetti
+        for (let i = confettiParticles.length - 1; i >= 0; i--) {
+          const p = confettiParticles[i];
+          p.x += p.vx * dt;
+          p.y += p.vy * dt;
+          p.vy += 120 * dt;
+          p.rot += p.vRot * dt;
+          p.life -= dt;
+          if (p.life <= 0) confettiParticles.splice(i, 1);
+        }
+
+        // Compute non-overlapping Name Label positions for ground students
+        resolveLabelCollisions();
+      }
+
+      /**
+       * Anti-overlap algorithm for student name tags so every student's name
+       * remains crisp and readable on classroom projectors.
+       */
+      function resolveLabelCollisions() {
+        ctx2d.font = '800 12px "Nunito", sans-serif';
+        const groundStudents = studentEntities.filter((st) => {
+          if ((gameState === 'ABDUCTING' || gameState === 'RESULT') && st === chosenStudent) return false;
+          return true;
+        });
+
+        const boxes = groundStudents.map((st) => {
+          const w = Math.max(54, ctx2d.measureText(st.name).width + 18);
+          const h = 22;
+          st.labelX = st.x;
+          st.labelY = st.y + 25 - st.z * 0.3;
+          st.labelW = w;
+          st.labelH = h;
+          return st;
+        });
+
+        // 3 relaxation passes to push overlapping labels apart cleanly
+        for (let pass = 0; pass < 3; pass++) {
+          for (let i = 0; i < boxes.length; i++) {
+            for (let j = i + 1; j < boxes.length; j++) {
+              const a = boxes[i];
+              const b = boxes[j];
+              const dx = a.labelX - b.labelX;
+              const dy = a.labelY - b.labelY;
+              const minDx = (a.labelW + b.labelW) * 0.52;
+              const minDy = (a.labelH + b.labelH) * 0.58;
+
+              if (Math.abs(dx) < minDx && Math.abs(dy) < minDy) {
+                const overlapY = minDy - Math.abs(dy);
+                const dirY = dy >= 0 ? 1 : -1;
+                a.labelY += dirY * overlapY * 0.55;
+                b.labelY -= dirY * overlapY * 0.55;
+
+                const overlapX = minDx - Math.abs(dx);
+                const dirX = dx >= 0 ? 1 : -1;
+                a.labelX += dirX * overlapX * 0.15;
+                b.labelX -= dirX * overlapX * 0.15;
+              }
+            }
+          }
+        }
+      }
+
+      // =========================================================================
+      // 6. 2D CARTOON RENDERING (6 VIETNAMESE SCHOOLYARD THEMES, CHIBI STUDENTS, UFO)
+      // =========================================================================
+      const YARD_THEME_CONFIG = {
+        phuong_vi: {
+          sky: ['#67C6F5', '#BCEEFF', '#FFF4D2'],
+          hills: ['#B4E9AE', '#9ADFA0'],
+          lawn: ['#C6EFA8', '#A3E4A1', '#82D49B'],
+          wall: '#FFF8E7',
+          wallTrim: '#F4A261',
+          wallBody: '#FFE58F',
+          hallBody: '#FFF0B3',
+          roof: '#F43F5E',
+          roofDark: '#E11D48',
+          shutter: '#22C55E',
+          windowPane: '#BAE6FD',
+          bannerBg: '#E11D48',
+          bannerText: '★ TRƯỜNG HỌC HẠNH PHÚC ★',
+          rainbow: true
+        },
+        khai_giang: {
+          sky: ['#38BDF8', '#BAE6FD', '#FEF3C7'],
+          hills: ['#A7F3D0', '#6EE7B7'],
+          lawn: ['#86EFAC', '#4ADE80', '#22C55E'],
+          wall: '#FFF1F2',
+          wallTrim: '#FB7185',
+          wallBody: '#FFE4E6',
+          hallBody: '#FFF1F2',
+          roof: '#E11D48',
+          roofDark: '#BE123C',
+          shutter: '#F59E0B',
+          windowPane: '#E0F2FE',
+          bannerBg: '#DC2626',
+          bannerText: '★ CHÀO MỪNG NĂM HỌC MỚI ★',
+          rainbow: true
+        },
+        hien_dai: {
+          sky: ['#0EA5E9', '#7DD3FC', '#E0F2FE'],
+          hills: ['#99F6E4', '#5EEAD4'],
+          lawn: ['#4ADE80', '#22C55E', '#16A34A'],
+          wall: '#F1F5F9',
+          wallTrim: '#38BDF8',
+          wallBody: '#F8FAFC',
+          hallBody: '#E0F2FE',
+          roof: '#0284C7',
+          roofDark: '#0369A1',
+          shutter: '#0EA5E9',
+          windowPane: '#7DD3FC',
+          bannerBg: '#1D4ED8',
+          bannerText: '★ TRƯỜNG CHUẨN QUỐC GIA ★',
+          rainbow: false
+        },
+        mua_xuan: {
+          sky: ['#7DD3FC', '#FDE68A', '#FFFBEB'],
+          hills: ['#D9F99D', '#BEF264'],
+          lawn: ['#BEF264', '#86EFAC', '#4ADE80'],
+          wall: '#FEF3C7',
+          wallTrim: '#EF4444',
+          wallBody: '#FDE68A',
+          hallBody: '#FEF9C3',
+          roof: '#DC2626',
+          roofDark: '#B91C1C',
+          shutter: '#16A34A',
+          windowPane: '#FEF08A',
+          bannerBg: '#DC2626',
+          bannerText: '★ MỪNG ĐẢNG - MỪNG XUÂN ★',
+          rainbow: true
+        },
+        trung_thu: {
+          sky: ['#0F172A', '#1E1B4B', '#312E81'],
+          hills: ['#1E293B', '#0F172A'],
+          lawn: ['#065F46', '#064E3B', '#022C22'],
+          wall: '#334155',
+          wallTrim: '#F59E0B',
+          wallBody: '#FDE68A',
+          hallBody: '#FEF08A',
+          roof: '#BE123C',
+          roofDark: '#881337',
+          shutter: '#B45309',
+          windowPane: '#FDE047',
+          bannerBg: '#B91C1C',
+          bannerText: '★ ĐÊM HỘI TRĂNG RẰM ★',
+          rainbow: false
+        },
+        vung_cao: {
+          sky: ['#60A5FA', '#BFDBFE', '#FEF3C7'],
+          hills: ['#818CF8', '#34D399'],
+          lawn: ['#A3E635', '#65A30D', '#4D7C0F'],
+          wall: '#FDE68A',
+          wallTrim: '#92400E',
+          wallBody: '#FED7AA',
+          hallBody: '#FFEDD5',
+          roof: '#EA580C',
+          roofDark: '#C2410C',
+          shutter: '#92400E',
+          windowPane: '#BAE6FD',
+          bannerBg: '#B91C1C',
+          bannerText: '★ ĐIỂM TRƯỜNG HẠNH PHÚC ★',
+          rainbow: true
+        }
+      };
+
+      function drawScene() {
+        ctx2d.clearRect(0, 0, cw, ch);
+        const horizonY = Math.max(218, ch * 0.44);
+        const nowSec = performance.now() * 0.001;
+        const theme = YARD_THEME_CONFIG[currentYardTheme] || YARD_THEME_CONFIG.phuong_vi;
+
+        // 1. Theme-Specific Sky Gradient
+        const skyGrad = ctx2d.createLinearGradient(0, 0, 0, horizonY);
+        skyGrad.addColorStop(0, theme.sky[0]);
+        skyGrad.addColorStop(0.55, theme.sky[1]);
+        skyGrad.addColorStop(1, theme.sky[2]);
+        ctx2d.fillStyle = skyGrad;
+        ctx2d.fillRect(0, 0, cw, horizonY);
+
+        // Soft Pastel Rainbow for Daytime Festive Themes
+        if (theme.rainbow) {
+          ctx2d.save();
+          const rbColors = [
+            'rgba(255, 107, 139, 0.22)',
+            'rgba(255, 184, 48, 0.22)',
+            'rgba(74, 222, 128, 0.22)',
+            'rgba(56, 189, 248, 0.22)',
+            'rgba(192, 132, 252, 0.20)'
+          ];
+          rbColors.forEach((col, i) => {
+            ctx2d.strokeStyle = col;
+            ctx2d.lineWidth = 9;
+            ctx2d.beginPath();
+            ctx2d.arc(cw * 0.5, horizonY + 85, Math.min(460, cw * 0.44) - i * 9, Math.PI * 1.12, Math.PI * 1.88);
+            ctx2d.stroke();
+          });
+          ctx2d.restore();
+        }
+
+        // 2. Sky Celestial Objects: Full Harvest Moon & Stars (trung_thu) vs. Smiling Sun (day themes)
+        const sunX = cw - 92;
+        const sunY = 68;
+        if (currentYardTheme === 'trung_thu') {
+          ctx2d.save();
+          // Twinkling night stars
+          for (let s = 0; s < 32; s++) {
+            const sx = ((s * 137) % Math.max(200, cw - 40)) + 20;
+            const sy = ((s * 61) % Math.max(80, horizonY - 50)) + 14;
+            const twinkle = 0.35 + 0.65 * Math.abs(Math.sin(nowSec * 2.5 + s));
+            ctx2d.fillStyle = `rgba(254, 249, 195, ${twinkle.toFixed(2)})`;
+            ctx2d.beginPath();
+            ctx2d.arc(sx, sy, (s % 3 === 0) ? 2.4 : 1.5, 0, Math.PI * 2);
+            ctx2d.fill();
+          }
+          // Glowing Full Mid-Autumn Moon
+          const moonGlow = ctx2d.createRadialGradient(sunX, sunY, 10, sunX, sunY, 78);
+          moonGlow.addColorStop(0, 'rgba(254, 240, 138, 0.95)');
+          moonGlow.addColorStop(0.5, 'rgba(250, 204, 21, 0.32)');
+          moonGlow.addColorStop(1, 'rgba(250, 204, 21, 0)');
+          ctx2d.fillStyle = moonGlow;
+          ctx2d.beginPath();
+          ctx2d.arc(sunX, sunY, 78, 0, Math.PI * 2);
+          ctx2d.fill();
+
+          ctx2d.fillStyle = '#FEF08A';
+          ctx2d.beginPath();
+          ctx2d.arc(sunX, sunY, 36, 0, Math.PI * 2);
+          ctx2d.fill();
+          // Subtle moon craters
+          ctx2d.fillStyle = 'rgba(245, 158, 11, 0.22)';
+          ctx2d.beginPath();
+          ctx2d.arc(sunX - 11, sunY - 8, 7, 0, Math.PI * 2);
+          ctx2d.arc(sunX + 12, sunY + 9, 9, 0, Math.PI * 2);
+          ctx2d.arc(sunX + 6, sunY - 12, 4.5, 0, Math.PI * 2);
+          ctx2d.fill();
+          ctx2d.restore();
+        } else {
+          ctx2d.save();
+          ctx2d.fillStyle = 'rgba(254, 240, 138, 0.38)';
+          ctx2d.beginPath();
+          ctx2d.arc(sunX, sunY, 56, 0, Math.PI * 2);
+          ctx2d.fill();
+
+          ctx2d.save();
+          ctx2d.translate(sunX, sunY);
+          ctx2d.rotate(nowSec * 0.14);
+          ctx2d.strokeStyle = '#FACC15';
+          ctx2d.lineWidth = 4.5;
+          ctx2d.lineCap = 'round';
+          for (let i = 0; i < 12; i++) {
+            const ang = (i * Math.PI) / 6;
+            ctx2d.beginPath();
+            ctx2d.moveTo(Math.cos(ang) * 39, Math.sin(ang) * 39);
+            ctx2d.lineTo(Math.cos(ang) * 50, Math.sin(ang) * 50);
+            ctx2d.stroke();
+          }
+          ctx2d.restore();
+
+          ctx2d.fillStyle = '#FDE047';
+          ctx2d.strokeStyle = '#F59E0B';
+          ctx2d.lineWidth = 2.5;
+          ctx2d.beginPath();
+          ctx2d.arc(sunX, sunY, 32, 0, Math.PI * 2);
+          ctx2d.fill();
+          ctx2d.stroke();
+
+          ctx2d.fillStyle = 'rgba(251, 113, 133, 0.45)';
+          ctx2d.beginPath();
+          ctx2d.ellipse(sunX - 15, sunY + 3, 4.5, 2.5, 0, 0, Math.PI * 2);
+          ctx2d.ellipse(sunX + 15, sunY + 3, 4.5, 2.5, 0, 0, Math.PI * 2);
+          ctx2d.fill();
+          ctx2d.fillStyle = '#92400E';
+          ctx2d.beginPath();
+          ctx2d.ellipse(sunX - 9.5, sunY - 3, 2.8, 4, 0, 0, Math.PI * 2);
+          ctx2d.ellipse(sunX + 9.5, sunY - 3, 2.8, 4, 0, 0, Math.PI * 2);
+          ctx2d.fill();
+          ctx2d.strokeStyle = '#92400E';
+          ctx2d.lineWidth = 2.3;
+          ctx2d.beginPath();
+          ctx2d.arc(sunX, sunY + 3, 8.5, 0.12 * Math.PI, 0.88 * Math.PI);
+          ctx2d.stroke();
+          ctx2d.restore();
+        }
+
+        // 3. Fluffy Clouds, Swallows & Hot Air Balloons (for Khai Giảng)
+        clouds.forEach((c) => drawCloud(ctx2d, c.x, c.y, c.scale));
+        if (currentYardTheme !== 'trung_thu') {
+          birds.forEach((b) => drawBird(ctx2d, b.x, b.y, b.wingPhase));
+        }
+        if (currentYardTheme === 'khai_giang') {
+          drawHotAirBalloon(ctx2d, cw * 0.15, 78 + Math.sin(nowSec * 1.4) * 7, 0.85, '#F43F5E', '#FACC15');
+          drawHotAirBalloon(ctx2d, cw * 0.80, 92 + Math.cos(nowSec * 1.2) * 7, 0.72, '#3B82F6', '#4ADE80');
+        }
+
+        // 4. Schoolyard Ground Gradient
+        const lawnGrad = ctx2d.createLinearGradient(0, horizonY, 0, ch);
+        lawnGrad.addColorStop(0, theme.lawn[0]);
+        lawnGrad.addColorStop(0.45, theme.lawn[1]);
+        lawnGrad.addColorStop(1, theme.lawn[2]);
+        ctx2d.fillStyle = lawnGrad;
+        ctx2d.fillRect(0, horizonY, cw, ch - horizonY);
+
+        // Theme-specific Ground & Yard Decorations
+        drawYardDecorations(ctx2d, horizonY, nowSec);
+
+        // 5. Theme-specific Vietnamese School Building, Trees & Props
+        drawSchoolBackground(ctx2d, horizonY, nowSec);
+
+        // 6. UFO Ground Shadow / Target Ring & Chasing Searchlight
+        drawUfoGroundShadow(ctx2d, horizonY);
+        if (ufo.searchBeamAlpha > 0.01) {
+          drawSearchlightBeam(ctx2d, horizonY);
+        }
+
+        // 7. Dropped Shoes on the Ground
+        droppedShoes.forEach((sh) => drawDroppedShoe(ctx2d, sh));
+
+        // 8. Sort ground students by Y coordinate for proper 2.5D depth sorting
+        const sortedStudents = [...studentEntities].sort((a, b) => a.y - b.y);
+        sortedStudents.forEach((st) => {
+          if ((gameState === 'ABDUCTING' || gameState === 'RESULT') && st === chosenStudent) return;
+          drawChibiStudent(ctx2d, st);
+        });
+
+        // 9. Draw Crisp Anti-Overlapping Name Labels & Speech Bubbles for Ground Students
+        sortedStudents.forEach((st) => {
+          if ((gameState === 'ABDUCTING' || gameState === 'RESULT') && st === chosenStudent) return;
+          drawStudentNameTag(ctx2d, st);
+          if (st.speechText && st.speechTimer > 0) {
+            drawSpeechBubble(ctx2d, st);
+          }
+        });
+
+        // 10. Tractor Beam Background Cone (if active)
+        if (ufo.beamProgress > 0.01) {
+          drawTractorBeamBack(ctx2d);
+        }
+
+        // 11. Draw chosenStudent rising & shrinking inside the Tractor Beam (clipped at UFO bottom hatch!)
+        if (gameState === 'ABDUCTING' && chosenStudent && chosenStudent.scale > 0.02) {
+          ctx2d.save();
+          ctx2d.beginPath();
+          ctx2d.rect(0, Math.max(0, ufo.y + 8), cw, ch);
+          ctx2d.clip();
+          drawChibiStudent(ctx2d, chosenStudent);
+          drawAbductingStudentOverlay(ctx2d, chosenStudent);
+          ctx2d.restore();
+        }
+
+        // 12. Tractor Beam Foreground Rings & Rising Sparkle Particles
+        if (ufo.beamProgress > 0.01) {
+          drawTractorBeamFront(ctx2d);
+        }
+
+        // 13. Draw the Mischievous Alien, Captured Student in Cockpit & Cute UFO
+        drawCuteUfo(ctx2d);
+
+        // 14. Draw Hatch Capture Burst Sparkles (when student is sucked inside UFO!)
+        hatchSparkles.forEach((sp) => {
+          ctx2d.save();
+          ctx2d.globalAlpha = Math.max(0, sp.life / sp.maxLife);
+          ctx2d.fillStyle = sp.color;
+          ctx2d.beginPath();
+          ctx2d.arc(sp.x, sp.y, sp.r, 0, Math.PI * 2);
+          ctx2d.fill();
+          ctx2d.restore();
+        });
+
+        // 15. Draw Confetti Particles
+        confettiParticles.forEach((p) => {
+          ctx2d.save();
+          ctx2d.translate(p.x, p.y);
+          ctx2d.rotate(p.rot);
+          ctx2d.fillStyle = p.color;
+          ctx2d.fillRect(-5, -3, 10, 6);
+          ctx2d.restore();
+        });
+      }
+
+      function drawCloud(c, x, y, scale) {
+        c.save();
+        c.translate(x, y);
+        c.scale(scale, scale);
+        c.fillStyle = currentYardTheme === 'trung_thu'
+          ? 'rgba(148, 163, 184, 0.25)'
+          : 'rgba(255, 255, 255, 0.94)';
+        c.beginPath();
+        c.arc(0, 2, 22, 0, Math.PI * 2);
+        c.arc(20, -6, 27, 0, Math.PI * 2);
+        c.arc(45, -2, 23, 0, Math.PI * 2);
+        c.arc(64, 4, 17, 0, Math.PI * 2);
+        c.arc(30, 8, 24, 0, Math.PI * 2);
+        c.fill();
+        c.restore();
+      }
+
+      function drawBird(c, x, y, phase) {
+        c.save();
+        c.translate(x, y);
+        c.strokeStyle = currentYardTheme === 'mua_xuan' ? '#1E293B' : '#0284C7';
+        c.lineWidth = 2.2;
+        c.lineCap = 'round';
+        const wingY = Math.sin(phase) * 5;
+        c.beginPath();
+        c.moveTo(-8, wingY);
+        c.quadraticCurveTo(-4, -4, 0, 0);
+        c.quadraticCurveTo(4, -4, 8, wingY);
+        c.stroke();
+        c.restore();
+      }
+
+      function drawHotAirBalloon(c, x, y, scale, col1, col2) {
+        c.save();
+        c.translate(x, y);
+        c.scale(scale, scale);
+        // Basket
+        c.fillStyle = '#92400E';
+        c.fillRect(-6, 24, 12, 9);
+        c.strokeStyle = '#78350F';
+        c.lineWidth = 1.2;
+        c.beginPath();
+        c.moveTo(-5, 16); c.lineTo(-4, 24);
+        c.moveTo(5, 16); c.lineTo(4, 24);
+        c.stroke();
+        // Balloon envelope
+        c.fillStyle = col1;
+        c.beginPath();
+        c.arc(0, 0, 20, 0, Math.PI * 2);
+        c.fill();
+        c.fillStyle = col2;
+        c.beginPath();
+        c.ellipse(0, 0, 9, 20, 0, 0, Math.PI * 2);
+        c.fill();
+        c.restore();
+      }
+
+      function drawSchoolBackground(c, horizonY, nowSec) {
+        const theme = YARD_THEME_CONFIG[currentYardTheme] || YARD_THEME_CONFIG.phuong_vi;
+
+        // 1. Distant Hills / Mountains (Majestic peaks + terraced fields for vung_cao)
+        if (currentYardTheme === 'vung_cao') {
+          // High Northwest Mountains
+          c.fillStyle = '#6366F1';
+          c.beginPath();
+          c.moveTo(0, horizonY);
+          c.lineTo(cw * 0.18, horizonY - 95);
+          c.lineTo(cw * 0.38, horizonY - 35);
+          c.lineTo(cw * 0.62, horizonY - 108);
+          c.lineTo(cw * 0.84, horizonY - 42);
+          c.lineTo(cw, horizonY - 88);
+          c.lineTo(cw, horizonY);
+          c.closePath();
+          c.fill();
+
+          // Golden Rice Terraces (Ruộng bậc thang mùa vàng)
+          const terraceColors = ['#34D399', '#84CC16', '#FACC15', '#F59E0B'];
+          terraceColors.forEach((tCol, idx) => {
+            c.fillStyle = tCol;
+            const hOff = 48 - idx * 11;
+            c.beginPath();
+            c.moveTo(0, horizonY);
+            c.quadraticCurveTo(cw * 0.25, horizonY - hOff, cw * 0.5, horizonY - hOff * 0.4);
+            c.quadraticCurveTo(cw * 0.78, horizonY - hOff * 1.1, cw, horizonY);
+            c.closePath();
+            c.fill();
+          });
+        } else {
+          c.fillStyle = theme.hills[0];
+          c.beginPath();
+          c.moveTo(0, horizonY);
+          c.quadraticCurveTo(cw * 0.22, horizonY - 58, cw * 0.48, horizonY - 12);
+          c.quadraticCurveTo(cw * 0.76, horizonY - 64, cw, horizonY);
+          c.closePath();
+          c.fill();
+
+          c.fillStyle = theme.hills[1];
+          c.beginPath();
+          c.moveTo(0, horizonY);
+          c.quadraticCurveTo(cw * 0.32, horizonY - 34, cw * 0.65, horizonY - 6);
+          c.quadraticCurveTo(cw * 0.85, horizonY - 38, cw, horizonY);
+          c.closePath();
+          c.fill();
+        }
+
+        const cx = cw * 0.5;
+        const bW = Math.min(540, Math.max(330, cw * 0.56));
+        const bH = 104;
+        const bX = cx - bW * 0.5;
+        const bY = horizonY - bH + 8;
+
+        // 2. School Perimeter Wall / Fence
+        if (currentYardTheme === 'vung_cao') {
+          // Rustic Wooden Fence for Highland School
+          c.strokeStyle = '#92400E';
+          c.lineWidth = 3;
+          c.beginPath();
+          c.moveTo(0, horizonY - 14); c.lineTo(cw, horizonY - 14);
+          c.moveTo(0, horizonY - 7); c.lineTo(cw, horizonY - 7);
+          c.stroke();
+          c.fillStyle = '#B45309';
+          for (let px = 12; px < cw; px += 22) {
+            if (px > bX - 16 && px < bX + bW + 16) continue;
+            c.fillRect(px - 3, horizonY - 22, 6, 22);
+          }
+        } else {
+          c.fillStyle = theme.wall;
+          c.fillRect(0, horizonY - 22, cw, 22);
+          c.fillStyle = theme.wallTrim;
+          c.fillRect(0, horizonY - 25, cw, 4);
+          for (let px = 20; px < cw; px += 46) {
+            if (px > bX - 18 && px < bX + bW + 18) continue;
+            c.fillStyle = theme.wallTrim;
+            c.fillRect(px - 5, horizonY - 28, 10, 28);
+            if ((Math.floor(px / 46) % 2) === 0 && currentYardTheme !== 'hien_dai') {
+              c.fillStyle = '#4ADE80';
+              c.beginPath();
+              c.arc(px + 18, horizonY - 24, 11, 0, Math.PI * 2);
+              c.fill();
+              c.fillStyle = currentYardTheme === 'mua_xuan' ? '#FACC15' : '#F43F5E';
+              c.beginPath();
+              c.arc(px + 14, horizonY - 27, 7, 0, Math.PI * 2);
+              c.arc(px + 23, horizonY - 24, 6.5, 0, Math.PI * 2);
+              c.fill();
+            }
+          }
+        }
+
+        // 3. Main 2-Story School Building Wings
+        c.fillStyle = theme.wallBody;
+        c.beginPath();
+        c.roundRect(bX, bY, bW, bH, 8);
+        c.fill();
+
+        const midFloorY = bY + bH * 0.50;
+        c.fillStyle = currentYardTheme === 'hien_dai' ? '#38BDF8' : '#FFFDF7';
+        c.fillRect(bX - 4, midFloorY - 4, bW + 8, 8);
+        c.fillStyle = theme.wallTrim;
+        c.fillRect(bX, bY + bH - 6, bW, 6);
+
+        // Classroom Windows on Left & Right Wings
+        const wingEndLeft = cx - 80;
+        const wingStartRight = cx + 80;
+        const leftSpan = Math.max(60, wingEndLeft - (bX + 16));
+        const colsPerWing = bW > 430 ? 3 : 2;
+        const colSpacing = leftSpan / colsPerWing;
+
+        for (let side = 0; side < 2; side++) {
+          const baseWingX = side === 0 ? (bX + 16) : wingStartRight;
+          for (let col = 0; col < colsPerWing; col++) {
+            const wx = baseWingX + col * colSpacing + (colSpacing - 24) * 0.5;
+            c.fillStyle = '#FFFBF0';
+            c.fillRect(wx - 8, bY + 6, 4, bH - 12);
+
+            [bY + 12, midFloorY + 10].forEach((wy) => {
+              c.fillStyle = '#FFFDF9';
+              c.beginPath();
+              c.roundRect(wx - 2, wy - 2, 26, 30, 5);
+              c.fill();
+              c.fillStyle = theme.windowPane;
+              c.beginPath();
+              c.roundRect(wx + 1, wy + 1, 20, 24, 3);
+              c.fill();
+              // Shutters (or modern blue glass trim)
+              c.fillStyle = theme.shutter;
+              c.beginPath();
+              c.roundRect(wx - 6, wy + 1, 6, 24, 2);
+              c.roundRect(wx + 22, wy + 1, 6, 24, 2);
+              c.fill();
+              c.strokeStyle = '#FFFFFF';
+              c.lineWidth = 1.6;
+              c.beginPath();
+              c.moveTo(wx + 11, wy + 1);
+              c.lineTo(wx + 11, wy + 25);
+              c.moveTo(wx + 1, wy + 13);
+              c.lineTo(wx + 21, wy + 13);
+              c.stroke();
+            });
+          }
+        }
+
+        // 4. Stepped School Roof
+        c.fillStyle = theme.roof;
+        c.beginPath();
+        c.moveTo(bX - 18, bY + 5);
+        c.lineTo(bX + 16, bY - 22);
+        c.lineTo(bX + bW - 16, bY - 22);
+        c.lineTo(bX + bW + 18, bY + 5);
+        c.closePath();
+        c.fill();
+
+        c.fillStyle = theme.roofDark;
+        c.beginPath();
+        c.roundRect(bX + 12, bY - 25, bW - 24, 6, 3);
+        c.fill();
+
+        // 5. Grand Central Hall & Clock Gable
+        const cW = 156;
+        const cH = bH + 18;
+        const cX = cx - cW * 0.5;
+        const cY = horizonY - cH + 8;
+
+        c.fillStyle = theme.hallBody;
+        c.beginPath();
+        c.roundRect(cX, cY, cW, cH, 8);
+        c.fill();
+
+        c.fillStyle = theme.roofDark;
+        c.beginPath();
+        c.moveTo(cX - 16, cY + 8);
+        c.lineTo(cx, cY - 32);
+        c.lineTo(cX + cW + 16, cY + 8);
+        c.closePath();
+        c.fill();
+
+        c.fillStyle = '#FFF1F2';
+        c.beginPath();
+        c.moveTo(cX - 6, cY + 6);
+        c.lineTo(cx, cY - 22);
+        c.lineTo(cX + cW + 6, cY + 6);
+        c.closePath();
+        c.fill();
+
+        // School Clock inside the Gable
+        c.fillStyle = '#F59E0B';
+        c.beginPath();
+        c.arc(cx, cY - 6, 13, 0, Math.PI * 2);
+        c.fill();
+        c.fillStyle = '#FFFFFF';
+        c.beginPath();
+        c.arc(cx, cY - 6, 10, 0, Math.PI * 2);
+        c.fill();
+        c.strokeStyle = '#BE123C';
+        c.lineWidth = 1.8;
+        c.beginPath();
+        c.moveTo(cx, cY - 6);
+        c.lineTo(cx, cY - 12);
+        c.moveTo(cx, cY - 6);
+        c.lineTo(cx + 5, cY - 6);
+        c.stroke();
+
+        // School Banner
+        const bannerW = Math.min(236, bW * 0.54);
+        c.fillStyle = theme.bannerBg;
+        c.strokeStyle = '#FDE047';
+        c.lineWidth = 2.5;
+        c.beginPath();
+        c.roundRect(cx - bannerW * 0.5, cY + 12, bannerW, 24, 6);
+        c.fill();
+        c.stroke();
+
+        c.fillStyle = '#FEF08A';
+        c.font = '900 10.5px "Nunito", sans-serif';
+        c.textAlign = 'center';
+        c.textBaseline = 'middle';
+        c.fillText(theme.bannerText, cx, cY + 24.5);
+
+        // Central Arched Entrance Hallway
+        c.fillStyle = currentYardTheme === 'trung_thu' ? '#FDE047' : '#7DD3FC';
+        c.beginPath();
+        c.roundRect(cx - 28, cY + 46, 56, cH - 46, [24, 24, 0, 0]);
+        c.fill();
+        c.strokeStyle = '#FFFFFF';
+        c.lineWidth = 2.5;
+        c.beginPath();
+        c.moveTo(cx, cY + 48);
+        c.lineTo(cx, cY + cH);
+        c.stroke();
+
+        // Tết Red Couplets (Câu đối Tết) for mua_xuan
+        if (currentYardTheme === 'mua_xuan') {
+          [-42, 42].forEach((ox) => {
+            c.fillStyle = '#DC2626';
+            c.strokeStyle = '#FACC15';
+            c.lineWidth = 1.5;
+            c.beginPath();
+            c.roundRect(cx + ox - 6, cY + 46, 12, 46, 3);
+            c.fill();
+            c.stroke();
+            c.fillStyle = '#FEF08A';
+            for (let dot = 0; dot < 4; dot++) {
+              c.beginPath();
+              c.arc(cx + ox, cY + 54 + dot * 10, 2, 0, Math.PI * 2);
+              c.fill();
+            }
+          });
+        }
+
+        // Opening Day Colorful Balloon Arch (Cổng bóng bay Khai Giảng)
+        if (currentYardTheme === 'khai_giang') {
+          const archCols = ['#EF4444', '#FACC15', '#3B82F6', '#4ADE80', '#EC4899', '#FB923C'];
+          for (let i = 0; i <= 14; i++) {
+            const ang = Math.PI + (i / 14) * Math.PI;
+            const bx = cx + Math.cos(ang) * 44;
+            const by = (horizonY + 4) + Math.sin(ang) * 52;
+            c.fillStyle = archCols[i % archCols.length];
+            c.beginPath();
+            c.arc(bx, by, 8.5, 0, Math.PI * 2);
+            c.fill();
+          }
+        }
+
+        // Iconic Red School Drum (Trống Trường Việt Nam) on the Right Porch!
+        const drumX = cx + 48;
+        const drumY = horizonY - 12;
+        c.strokeStyle = '#78350F';
+        c.lineWidth = 3;
+        c.beginPath();
+        c.moveTo(drumX - 9, drumY + 12);
+        c.lineTo(drumX - 3, drumY - 2);
+        c.moveTo(drumX + 9, drumY + 12);
+        c.lineTo(drumX + 3, drumY - 2);
+        c.stroke();
+        c.fillStyle = '#DC2626';
+        c.beginPath();
+        c.roundRect(drumX - 11, drumY - 12, 22, 15, 6);
+        c.fill();
+        c.fillStyle = '#FEF3C7';
+        c.strokeStyle = '#B45309';
+        c.lineWidth = 1.5;
+        c.beginPath();
+        c.ellipse(drumX - 10, drumY - 4.5, 4, 7, 0, 0, Math.PI * 2);
+        c.fill();
+        c.stroke();
+
+        // Front Courtyard Steps
+        c.fillStyle = '#FFFDF5';
+        c.beginPath();
+        c.roundRect(bX - 10, horizonY + 2, bW + 20, 12, 6);
+        c.fill();
+
+        // 6. Bunting Flags or Glowing Mid-Autumn Lantern Strings
+        const leftTreeX = Math.max(55, bX - 58);
+        const rightTreeX = Math.min(cw - 55, bX + bW + 58);
+        if (currentYardTheme === 'trung_thu') {
+          drawLanternString(c, cX + 8, cY + 10, leftTreeX + 10, horizonY - 58, nowSec);
+          drawLanternString(c, cX + cW - 8, cY + 10, rightTreeX - 10, horizonY - 58, nowSec);
+        } else {
+          drawBuntingFlagString(c, cX + 8, cY + 10, leftTreeX + 10, horizonY - 58, nowSec);
+          drawBuntingFlagString(c, cX + cW - 8, cY + 10, rightTreeX - 10, horizonY - 58, nowSec);
+        }
+
+        // 7. Theme-Specific Trees & Yard Structures on Left & Right
+        if (currentYardTheme === 'mua_xuan') {
+          // Left: Pink Peach Blossom (Hoa Đào), Right: Golden Apricot Blossom (Hoa Mai)
+          drawBlossomTree(c, leftTreeX, horizonY + 10, 1.05, nowSec, '#F472B6', '#FBCFE8');
+          drawBlossomTree(c, rightTreeX, horizonY + 10, 1.05, nowSec, '#FACC15', '#FEF08A');
+        } else if (currentYardTheme === 'hien_dai') {
+          // Purple Bằng Lăng trees + Basketball Hoops on the court
+          drawBlossomTree(c, leftTreeX, horizonY + 10, 1.0, nowSec, '#A855F7', '#E9D5FF');
+          drawBlossomTree(c, rightTreeX, horizonY + 10, 1.0, nowSec, '#A855F7', '#E9D5FF');
+          drawBasketballHoop(c, Math.max(48, cw * 0.10), horizonY + (ch - horizonY) * 0.48, 1);
+          drawBasketballHoop(c, Math.min(cw - 48, cw * 0.90), horizonY + (ch - horizonY) * 0.48, -1);
+        } else if (currentYardTheme === 'vung_cao') {
+          // Northwest White-Pink Hoa Ban Trees
+          drawBlossomTree(c, leftTreeX, horizonY + 10, 1.05, nowSec, '#F9A8D4', '#FFFFFF');
+          drawBlossomTree(c, rightTreeX, horizonY + 10, 1.05, nowSec, '#F472B6', '#FCE7F3');
+        } else {
+          // Classic Phượng Vĩ & Cây Bàng
+          drawPhuongViTree(c, leftTreeX, horizonY + 10, 1.05, nowSec);
+          if (leftTreeX > 120) {
+            drawBanyanTree(c, leftTreeX - 78, horizonY + 16, 0.82);
+          }
+          drawBanyanTree(c, rightTreeX, horizonY + 10, 1.05);
+          if (rightTreeX < cw - 120) {
+            drawPhuongViTree(c, rightTreeX + 78, horizonY + 16, 0.82, nowSec);
+          }
+        }
+
+        // Stone Bench
+        drawStoneBench(c, rightTreeX - 28, horizonY + 16);
+
+        // 8. Ceremonial Flagpole with Waving Vietnamese Flag
+        const flagPoleX = cx - 54;
+        const flagBaseY = horizonY + 12;
+        drawVietnameseFlagpole(c, flagPoleX, flagBaseY, nowSec);
+      }
+
+      function drawLanternString(c, x1, y1, x2, y2, nowSec) {
+        c.save();
+        const sag = 20 + Math.sin(nowSec * 2.2) * 3;
+        const midX = (x1 + x2) * 0.5;
+        const midY = (y1 + y2) * 0.5 + sag;
+        c.strokeStyle = 'rgba(253, 224, 71, 0.55)';
+        c.lineWidth = 1.5;
+        c.beginPath();
+        c.moveTo(x1, y1);
+        c.quadraticCurveTo(midX, midY, x2, y2);
+        c.stroke();
+
+        const cols = ['#EF4444', '#F59E0B', '#EC4899', '#10B981', '#FACC15'];
+        const count = 7;
+        for (let i = 1; i < count; i++) {
+          const t = i / count;
+          const inv = 1 - t;
+          const lx = inv * inv * x1 + 2 * inv * t * midX + t * t * x2;
+          const ly = inv * inv * y1 + 2 * inv * t * midY + t * t * y2;
+          const sway = Math.sin(nowSec * 3.2 + i) * 2.5;
+          // Warm lantern halo
+          c.fillStyle = 'rgba(254, 240, 138, 0.28)';
+          c.beginPath();
+          c.arc(lx + sway, ly + 8, 12, 0, Math.PI * 2);
+          c.fill();
+          // Lantern body
+          c.fillStyle = cols[i % cols.length];
+          c.beginPath();
+          c.ellipse(lx + sway, ly + 8, 6.5, 8, 0, 0, Math.PI * 2);
+          c.fill();
+          c.fillStyle = '#FDE047';
+          c.fillRect(lx + sway - 3, ly - 1, 6, 2);
+          c.fillRect(lx + sway - 1, ly + 16, 2, 5);
+        }
+        c.restore();
+      }
+
+      function drawBlossomTree(c, x, y, scale, nowSec, mainColor, accentColor) {
+        if (x < -50 || x > cw + 50) return;
+        c.save();
+        c.translate(x, y);
+        c.scale(scale, scale);
+
+        c.fillStyle = '#F4A261';
+        c.beginPath();
+        c.roundRect(-20, -6, 40, 10, 4);
+        c.fill();
+
+        c.fillStyle = '#78350F';
+        c.beginPath();
+        c.roundRect(-7, -54, 14, 50, 4);
+        c.fill();
+
+        // Blossom canopy clusters
+        const clusters = [
+          [0, -72, 33, mainColor],
+          [-24, -56, 24, mainColor],
+          [24, -56, 24, mainColor],
+          [-12, -80, 22, accentColor],
+          [14, -70, 20, accentColor]
+        ];
+        clusters.forEach(([bx, by, br, col]) => {
+          c.fillStyle = col;
+          c.beginPath();
+          c.arc(bx, by, br, 0, Math.PI * 2);
+          c.fill();
+        });
+
+        // Drifting petals
+        c.fillStyle = accentColor;
+        for (let p = 0; p < 4; p++) {
+          const py = -42 + ((nowSec * 16 + p * 14) % 45);
+          const px = -18 + p * 12 + Math.sin(nowSec * 3 + p) * 6;
+          c.beginPath();
+          c.arc(px, py, 2.5, 0, Math.PI * 2);
+          c.fill();
+        }
+        c.restore();
+      }
+
+      function drawBasketballHoop(c, x, y, dir) {
+        c.save();
+        c.translate(x, y);
+        // Post shadow
+        c.fillStyle = 'rgba(15, 23, 42, 0.18)';
+        c.beginPath();
+        c.ellipse(0, 2, 12, 5, 0, 0, Math.PI * 2);
+        c.fill();
+        // Steel post
+        c.strokeStyle = '#334155';
+        c.lineWidth = 4.5;
+        c.beginPath();
+        c.moveTo(0, 0);
+        c.lineTo(0, -68);
+        c.lineTo(dir * 14, -68);
+        c.stroke();
+        // Backboard
+        c.fillStyle = '#FFFFFF';
+        c.strokeStyle = '#EF4444';
+        c.lineWidth = 2;
+        c.beginPath();
+        c.roundRect(dir * 14 - 4, -82, 8, 24, 2);
+        c.fill();
+        c.stroke();
+        // Orange Rim & Net
+        const rimX = dir * 22;
+        c.strokeStyle = '#F97316';
+        c.lineWidth = 2.5;
+        c.beginPath();
+        c.moveTo(dir * 14, -64);
+        c.lineTo(rimX, -64);
+        c.stroke();
+        c.strokeStyle = 'rgba(255,255,255,0.85)';
+        c.lineWidth = 1.2;
+        c.beginPath();
+        c.moveTo(dir * 14, -64);
+        c.lineTo(dir * 16, -53);
+        c.lineTo(dir * 20, -53);
+        c.lineTo(rimX, -64);
+        c.stroke();
+        c.restore();
+      }
+
+      function drawBuntingFlagString(c, x1, y1, x2, y2, nowSec) {
+        c.save();
+        const sag = 18 + Math.sin(nowSec * 2.5) * 3;
+        const midX = (x1 + x2) * 0.5;
+        const midY = (y1 + y2) * 0.5 + sag;
+
+        c.strokeStyle = 'rgba(255, 255, 255, 0.75)';
+        c.lineWidth = 1.5;
+        c.beginPath();
+        c.moveTo(x1, y1);
+        c.quadraticCurveTo(midX, midY, x2, y2);
+        c.stroke();
+
+        const flagColors = ['#FF6B8B', '#FACC15', '#38BDF8', '#4ADE80', '#C084FC', '#FB923C'];
+        const count = 9;
+        for (let i = 1; i < count; i++) {
+          const t = i / count;
+          const inv = 1 - t;
+          const fx = inv * inv * x1 + 2 * inv * t * midX + t * t * x2;
+          const fy = inv * inv * y1 + 2 * inv * t * midY + t * t * y2;
+          const sway = Math.sin(nowSec * 4 + i) * 2;
+          c.fillStyle = flagColors[i % flagColors.length];
+          c.beginPath();
+          c.moveTo(fx - 5, fy);
+          c.lineTo(fx + 5, fy);
+          c.lineTo(fx + sway, fy + 11);
+          c.closePath();
+          c.fill();
+        }
+        c.restore();
+      }
+
+      function drawVietnameseFlagpole(c, x, baseY, nowSec) {
+        c.save();
+        c.fillStyle = '#FFFDF7';
+        c.beginPath();
+        c.roundRect(x - 16, baseY - 6, 32, 7, 2);
+        c.roundRect(x - 11, baseY - 12, 22, 6, 2);
+        c.fill();
+        c.fillStyle = '#EF4444';
+        c.fillRect(x - 11, baseY - 8, 22, 2);
+
+        const topY = baseY - 118;
+        c.strokeStyle = '#F8FAFC';
+        c.lineWidth = 3.5;
+        c.beginPath();
+        c.moveTo(x, baseY - 12);
+        c.lineTo(x, topY);
+        c.stroke();
+
+        c.fillStyle = '#FACC15';
+        c.beginPath();
+        c.arc(x, topY, 4, 0, Math.PI * 2);
+        c.fill();
+
+        const fw = 38;
+        const fh = 24;
+        const wave1 = Math.sin(nowSec * 4.5) * 3.5;
+        const wave2 = Math.cos(nowSec * 4.5) * 4.5;
+
+        c.fillStyle = '#EE2436';
+        c.beginPath();
+        c.moveTo(x + 1, topY + 3);
+        c.bezierCurveTo(x + fw * 0.4, topY + 3 + wave1, x + fw * 0.7, topY + 3 - wave2, x + fw, topY + 4 + wave2);
+        c.lineTo(x + fw, topY + 4 + fh + wave2);
+        c.bezierCurveTo(x + fw * 0.7, topY + 3 + fh - wave2, x + fw * 0.4, topY + 3 + fh + wave1, x + 1, topY + 3 + fh);
+        c.closePath();
+        c.fill();
+
+        const sx = x + fw * 0.5;
+        const sy = topY + 3 + fh * 0.5 + wave1 * 0.35;
+        c.fillStyle = '#FDE047';
+        c.beginPath();
+        for (let i = 0; i < 5; i++) {
+          const outerA = -Math.PI * 0.5 + (i * 2 * Math.PI) / 5;
+          const innerA = outerA + Math.PI / 5;
+          const ox = sx + Math.cos(outerA) * 6.2;
+          const oy = sy + Math.sin(outerA) * 6.2;
+          const ix = sx + Math.cos(innerA) * 2.5;
+          const iy = sy + Math.sin(innerA) * 2.5;
+          if (i === 0) c.moveTo(ox, oy);
+          else c.lineTo(ox, oy);
+          c.lineTo(ix, iy);
+        }
+        c.closePath();
+        c.fill();
+        c.restore();
+      }
+
+      function drawPhuongViTree(c, x, y, scale, nowSec) {
+        if (x < -50 || x > cw + 50) return;
+        c.save();
+        c.translate(x, y);
+        c.scale(scale, scale);
+
+        c.fillStyle = '#F4A261';
+        c.beginPath();
+        c.roundRect(-20, -6, 40, 10, 4);
+        c.fill();
+        c.fillStyle = '#FFFDF5';
+        c.fillRect(-18, -3, 36, 3);
+
+        c.fillStyle = '#8D6E63';
+        c.beginPath();
+        c.roundRect(-7, -54, 14, 50, 4);
+        c.fill();
+
+        c.fillStyle = '#4ADE80';
+        c.beginPath();
+        c.arc(0, -72, 34, 0, Math.PI * 2);
+        c.arc(-25, -56, 25, 0, Math.PI * 2);
+        c.arc(25, -56, 25, 0, Math.PI * 2);
+        c.fill();
+
+        c.fillStyle = '#86EFAC';
+        c.beginPath();
+        c.arc(-10, -78, 22, 0, Math.PI * 2);
+        c.arc(14, -68, 20, 0, Math.PI * 2);
+        c.fill();
+
+        const blossoms = [
+          [-16, -82, 13, '#FF4D4D'],
+          [12, -84, 14, '#FF6B4A'],
+          [0, -68, 12, '#EF4444'],
+          [-26, -62, 11, '#FF5733'],
+          [24, -60, 12, '#FF4D4D'],
+          [-6, -92, 10, '#FF7849']
+        ];
+        blossoms.forEach(([bx, by, br, col]) => {
+          c.fillStyle = col;
+          c.beginPath();
+          c.arc(bx, by, br, 0, Math.PI * 2);
+          c.fill();
+        });
+
+        c.fillStyle = '#FDE047';
+        for (let i = 0; i < 7; i++) {
+          c.beginPath();
+          c.arc(-20 + i * 7, -76 + (i % 3) * 8, 2, 0, Math.PI * 2);
+          c.fill();
+        }
+        c.fillStyle = '#FF4D4D';
+        for (let p = 0; p < 3; p++) {
+          const py = -40 + ((nowSec * 18 + p * 16) % 45);
+          const px = -18 + p * 16 + Math.sin(nowSec * 3 + p) * 6;
+          c.beginPath();
+          c.ellipse(px, py, 2.8, 1.5, 0.4, 0, Math.PI * 2);
+          c.fill();
+        }
+        c.restore();
+      }
+
+      function drawBanyanTree(c, x, y, scale) {
+        if (x < -50 || x > cw + 50) return;
+        c.save();
+        c.translate(x, y);
+        c.scale(scale, scale);
+
+        c.fillStyle = '#F4A261';
+        c.beginPath();
+        c.roundRect(-20, -6, 40, 10, 4);
+        c.fill();
+        c.fillStyle = '#FFFDF5';
+        c.fillRect(-18, -3, 36, 3);
+
+        c.fillStyle = '#8D6E63';
+        c.beginPath();
+        c.roundRect(-7, -54, 14, 50, 4);
+        c.fill();
+
+        c.fillStyle = '#34D399';
+        c.beginPath();
+        c.ellipse(0, -56, 38, 18, 0, 0, Math.PI * 2);
+        c.fill();
+        c.fillStyle = '#4ADE80';
+        c.beginPath();
+        c.ellipse(0, -74, 30, 16, 0, 0, Math.PI * 2);
+        c.fill();
+        c.fillStyle = '#86EFAC';
+        c.beginPath();
+        c.ellipse(-6, -88, 20, 12, 0, 0, Math.PI * 2);
+        c.fill();
+        c.restore();
+      }
+
+      function drawStoneBench(c, x, y) {
+        c.save();
+        c.translate(x, y);
+        c.fillStyle = '#94A3B8';
+        c.fillRect(-14, 2, 4, 6);
+        c.fillRect(10, 2, 4, 6);
+        c.fillStyle = '#F1F5F9';
+        c.beginPath();
+        c.roundRect(-18, -5, 36, 6, 2);
+        c.roundRect(-19, -1, 38, 4, 2);
+        c.fill();
+        c.restore();
+      }
+
+      function drawYardDecorations(c, horizonY, nowSec) {
+        const yardH = ch - horizonY;
+        const yardCenterY = horizonY + yardH * 0.54;
+        const yardRadiusX = cw * 0.41;
+        const yardRadiusY = yardH * 0.35;
+
+        if (currentYardTheme === 'hien_dai') {
+          // Terracotta red running track oval + green soccer/basketball court markings
+          c.save();
+          c.strokeStyle = '#EA580C';
+          c.lineWidth = 22;
+          c.beginPath();
+          c.ellipse(cw * 0.5, yardCenterY, yardRadiusX, yardRadiusY, 0, 0, Math.PI * 2);
+          c.stroke();
+          c.strokeStyle = 'rgba(255, 255, 255, 0.85)';
+          c.lineWidth = 2.5;
+          c.beginPath();
+          c.ellipse(cw * 0.5, yardCenterY, yardRadiusX - 11, yardRadiusY - 11, 0, 0, Math.PI * 2);
+          c.stroke();
+          c.beginPath();
+          c.moveTo(cw * 0.5, yardCenterY - yardRadiusY + 12);
+          c.lineTo(cw * 0.5, yardCenterY + yardRadiusY - 12);
+          c.stroke();
+          c.beginPath();
+          c.ellipse(cw * 0.5, yardCenterY, 48, 22, 0, 0, Math.PI * 2);
+          c.stroke();
+          c.restore();
+        } else if (currentYardTheme === 'khai_giang') {
+          // Red Carpet Ceremony Runway + Tiled Courtyard Apron
+          c.save();
+          c.fillStyle = 'rgba(254, 226, 226, 0.55)';
+          c.beginPath();
+          c.ellipse(cw * 0.5, yardCenterY, yardRadiusX, yardRadiusY, 0, 0, Math.PI * 2);
+          c.fill();
+          // Festive Red Carpet leading to school steps
+          c.fillStyle = '#E11D48';
+          c.beginPath();
+          c.moveTo(cw * 0.5 - 28, horizonY + 12);
+          c.lineTo(cw * 0.5 + 28, horizonY + 12);
+          c.lineTo(cw * 0.5 + 64, ch);
+          c.lineTo(cw * 0.5 - 64, ch);
+          c.closePath();
+          c.fill();
+          c.strokeStyle = '#FACC15';
+          c.lineWidth = 3;
+          c.beginPath();
+          c.moveTo(cw * 0.5 - 26, horizonY + 12); c.lineTo(cw * 0.5 - 60, ch);
+          c.moveTo(cw * 0.5 + 26, horizonY + 12); c.lineTo(cw * 0.5 + 60, ch);
+          c.stroke();
+          c.restore();
+        } else {
+          // Soft Warm Courtyard Apron & Playfield Track
+          c.save();
+          c.fillStyle = currentYardTheme === 'trung_thu'
+            ? 'rgba(30, 41, 59, 0.45)'
+            : 'rgba(255, 250, 230, 0.42)';
+          c.beginPath();
+          c.ellipse(cw * 0.5, yardCenterY, yardRadiusX, yardRadiusY, 0, 0, Math.PI * 2);
+          c.fill();
+
+          c.strokeStyle = currentYardTheme === 'trung_thu'
+            ? 'rgba(253, 224, 71, 0.32)'
+            : 'rgba(255, 255, 255, 0.72)';
+          c.lineWidth = 3;
+          c.beginPath();
+          c.ellipse(cw * 0.5, yardCenterY, yardRadiusX, yardRadiusY, 0, 0, Math.PI * 2);
+          c.stroke();
+
+          c.beginPath();
+          c.moveTo(cw * 0.5, yardCenterY - yardRadiusY + 3);
+          c.lineTo(cw * 0.5, yardCenterY + yardRadiusY - 3);
+          c.stroke();
+          c.beginPath();
+          c.ellipse(cw * 0.5, yardCenterY, 46, 20, 0, 0, Math.PI * 2);
+          c.stroke();
+          c.restore();
+        }
+
+        // Hopscotch Grid for daytime traditional themes
+        if (currentYardTheme === 'phuong_vi' || currentYardTheme === 'vung_cao') {
+          const hopX = Math.max(85, cw * 0.16);
+          const hopY = horizonY + yardH * 0.55;
+          c.save();
+          c.translate(hopX, hopY);
+          c.rotate(-0.12);
+          const hopColors = ['#FDE047', '#F9A8D4', '#7DD3FC', '#C4B5FD'];
+          const cells = [
+            [0, 0], [0, -16], [-9, -32], [9, -32], [0, -48]
+          ];
+          cells.forEach(([cx, cy], idx) => {
+            c.strokeStyle = hopColors[idx % hopColors.length];
+            c.fillStyle = 'rgba(255, 255, 255, 0.28)';
+            c.lineWidth = 2;
+            c.beginPath();
+            c.roundRect(cx - 8, cy - 7, 16, 14, 3);
+            c.fill();
+            c.stroke();
+          });
+          c.restore();
+        }
+
+        // Golden Marigold Pots & Bánh Chưng for Mùa Xuân (Tết)
+        if (currentYardTheme === 'mua_xuan') {
+          const potOffsets = [-115, -75, 75, 115];
+          potOffsets.forEach((ox) => {
+            const px = cw * 0.5 + ox;
+            const py = horizonY + 18;
+            c.fillStyle = '#DC2626';
+            c.beginPath();
+            c.roundRect(px - 8, py, 16, 10, 3);
+            c.fill();
+            c.fillStyle = '#FACC15';
+            c.beginPath();
+            c.arc(px, py - 4, 11, 0, Math.PI * 2);
+            c.fill();
+          });
+        }
+
+        // Glowing Fireflies / Garden Lanterns for Trung Thu
+        if (currentYardTheme === 'trung_thu') {
+          for (let f = 0; f < 14; f++) {
+            const fx = cw * (0.1 + ((f * 0.063) % 0.8)) + Math.sin(nowSec * 2 + f) * 12;
+            const fy = horizonY + yardH * (0.2 + ((f * 0.17) % 0.7)) + Math.cos(nowSec * 1.7 + f) * 6;
+            c.fillStyle = 'rgba(253, 224, 71, 0.75)';
+            c.beginPath();
+            c.arc(fx, fy, 2.6, 0, Math.PI * 2);
+            c.fill();
+          }
+        }
+
+        // Cheerful Little Flowers around the Yard Perimeter
+        const flowerCoords = [
+          [0.08, 0.24], [0.92, 0.24], [0.12, 0.82],
+          [0.88, 0.84], [0.06, 0.56], [0.94, 0.58],
+          [0.24, 0.90], [0.76, 0.90]
+        ];
+        flowerCoords.forEach(([rx, ry], idx) => {
+          const fx = cw * rx;
+          const fy = horizonY + yardH * ry;
+          c.save();
+          c.translate(fx, fy);
+          c.fillStyle = idx % 3 === 0 ? '#FB7185' : (idx % 3 === 1 ? '#FACC15' : '#C084FC');
+          for (let a = 0; a < 5; a++) {
+            const ang = (a * Math.PI * 2) / 5;
+            c.beginPath();
+            c.arc(Math.cos(ang) * 4.5, Math.sin(ang) * 4.5, 3.2, 0, Math.PI * 2);
+            c.fill();
+          }
+          c.fillStyle = '#FFFBEB';
+          c.beginPath();
+          c.arc(0, 0, 2.4, 0, Math.PI * 2);
+          c.fill();
+          c.restore();
+        });
+      }
+
+      function drawUfoGroundShadow(c, horizonY) {
+        const shadowX = (gameState === 'ABDUCTING' && chosenStudent) ? chosenStudent.abductAnchorX : ufo.x;
+        const shadowY = (gameState === 'ABDUCTING' && chosenStudent)
+          ? (chosenStudent.abductAnchorY + 14)
+          : Math.max(horizonY + 35, Math.min(ch - 55, ufo.y + 230));
+
+        c.save();
+        c.translate(shadowX, shadowY);
+        const pulse = 1 + Math.sin(ufo.lightPhase) * 0.08;
+        c.fillStyle = gameState === 'ABDUCTING'
+          ? 'rgba(250, 204, 21, 0.42)'
+          : (gameState === 'CHASING' ? 'rgba(244, 63, 94, 0.28)' : 'rgba(15, 23, 42, 0.14)');
+        c.beginPath();
+        c.ellipse(0, 0, (gameState === 'ABDUCTING' ? 68 : 46) * pulse, (gameState === 'ABDUCTING' ? 20 : 15) * pulse, 0, 0, Math.PI * 2);
+        c.fill();
+
+        if (gameState === 'CHASING' || gameState === 'ABDUCTING') {
+          c.strokeStyle = gameState === 'ABDUCTING' ? '#FACC15' : '#FB7185';
+          c.lineWidth = 2.5;
+          c.setLineDash([6, 4]);
+          c.beginPath();
+          c.ellipse(0, 0, (gameState === 'ABDUCTING' ? 78 : 54) * pulse, (gameState === 'ABDUCTING' ? 24 : 19) * pulse, 0, 0, Math.PI * 2);
+          c.stroke();
+        }
+        c.restore();
+      }
+
+      function drawSearchlightBeam(c, horizonY) {
+        const botY = Math.max(horizonY + 35, Math.min(ch - 55, ufo.y + 230));
+        const topY = ufo.y + 18;
+        c.save();
+        c.globalAlpha = ufo.searchBeamAlpha * 0.45;
+        const grad = c.createLinearGradient(ufo.x, topY, ufo.x, botY);
+        grad.addColorStop(0, 'rgba(251, 113, 133, 0.55)');
+        grad.addColorStop(1, 'rgba(254, 240, 138, 0.08)');
+        c.fillStyle = grad;
+        c.beginPath();
+        c.moveTo(ufo.x - 18, topY);
+        c.lineTo(ufo.x + 18, topY);
+        c.lineTo(ufo.x + 56, botY);
+        c.lineTo(ufo.x - 56, botY);
+        c.closePath();
+        c.fill();
+        c.restore();
+      }
+
+      function drawDroppedShoe(c, sh) {
+        c.save();
+        c.translate(sh.x, sh.y);
+        c.rotate(sh.rot);
+        // Cute sneaker with white sole
+        c.fillStyle = sh.color || '#EF4444';
+        c.strokeStyle = '#1E293B';
+        c.lineWidth = 2;
+        c.beginPath();
+        c.roundRect(-9, -6, 18, 10, 4);
+        c.fill();
+        c.stroke();
+        c.fillStyle = '#FFFFFF';
+        c.fillRect(-9, 2, 18, 3);
+        c.restore();
+      }
+
+      /**
+       * Draws an expressive Chibi Student (big head, small body, rosy cheeks,
+       * varied hairstyles, accessories, and comical expressions).
+       */
+      function drawChibiStudent(c, st, customScale) {
+        const sc = (customScale || 1) * (st.scale !== undefined ? st.scale : 1);
+        if (sc <= 0.02) return;
+
+        c.save();
+        const drawX = st.x;
+        const drawY = st.y - st.z;
+
+        // Ground shadow under student
+        if (!customScale) {
+          c.fillStyle = 'rgba(15, 23, 42, 0.18)';
+          const shadowScale = Math.max(0.2, (1 - st.z / 260) * sc);
+          const shadowBaseY = (gameState === 'ABDUCTING' && st === chosenStudent) ? st.abductAnchorY : st.y;
+          c.beginPath();
+          c.ellipse(st.x, shadowBaseY + 14, 16 * shadowScale, 6 * shadowScale, 0, 0, Math.PI * 2);
+          c.fill();
+        }
+
+        c.translate(drawX, drawY);
+        c.rotate(st.rotation || 0);
+        c.scale(sc * st.facing, sc);
+
+        const legSwing = Math.sin(st.walkPhase) * 8;
+        const armSwing = Math.cos(st.walkPhase) * 10;
+        const isAbducted = st.expression === 'abducted';
+        const isPanicFun = st.expression === 'panic_fun';
+        const isCheer = st.expression === 'cheer';
+
+        // 1. Legs & Shoes
+        c.lineWidth = 2.2;
+        c.strokeStyle = '#1E293B';
+
+        // Left Leg
+        c.save();
+        c.translate(-5, 2);
+        c.rotate((isAbducted ? Math.sin(st.walkPhase * 1.3) * 0.65 : legSwing * 0.05));
+        c.fillStyle = st.pantsColor;
+        c.beginPath();
+        c.roundRect(-3.5, 0, 7, 11, 3);
+        c.fill();
+        c.stroke();
+        if (st.hasLeftShoe) {
+          c.fillStyle = st.shoeColor;
+          c.beginPath();
+          c.roundRect(-4.5, 9, 9, 5, 2.5);
+          c.fill();
+          c.stroke();
+        }
+        c.restore();
+
+        // Right Leg
+        c.save();
+        c.translate(5, 2);
+        c.rotate((isAbducted ? -Math.sin(st.walkPhase * 1.3) * 0.65 : -legSwing * 0.05));
+        c.fillStyle = st.pantsColor;
+        c.beginPath();
+        c.roundRect(-3.5, 0, 7, 11, 3);
+        c.fill();
+        c.stroke();
+        if (st.hasRightShoe) {
+          c.fillStyle = st.shoeColor;
+          c.beginPath();
+          c.roundRect(-4.5, 9, 9, 5, 2.5);
+          c.fill();
+          c.stroke();
+        } else {
+          // Cute white sock exposed when shoe falls off!
+          c.fillStyle = '#FFFFFF';
+          c.beginPath();
+          c.roundRect(-3.5, 9, 7, 4, 2);
+          c.fill();
+          c.stroke();
+        }
+        c.restore();
+
+        // 2. Small Chibi Torso + White School Collar
+        c.fillStyle = st.shirtColor;
+        c.beginPath();
+        c.roundRect(-11, -13, 22, 17, 6);
+        c.fill();
+        c.stroke();
+
+        // Cute white collar / red scarf (khăn quàng đỏ)
+        c.fillStyle = '#EF4444';
+        c.beginPath();
+        c.moveTo(-7, -12);
+        c.lineTo(7, -12);
+        c.lineTo(0, -4);
+        c.closePath();
+        c.fill();
+
+        // 3. Arms (Raised and flailing when chased/abducted/cheering!)
+        const raiseArms = isAbducted || isPanicFun || isCheer;
+        c.save();
+        c.translate(-11, -10);
+        c.rotate(raiseArms ? (-2.3 + Math.sin(st.walkPhase) * 0.48) : (armSwing * 0.04));
+        c.fillStyle = st.shirtColor;
+        c.beginPath();
+        c.roundRect(-3, 0, 6, 12, 3);
+        c.fill();
+        c.stroke();
+        c.restore();
+
+        c.save();
+        c.translate(11, -10);
+        c.rotate(raiseArms ? (2.3 - Math.sin(st.walkPhase) * 0.48) : (-armSwing * 0.04));
+        c.fillStyle = st.shirtColor;
+        c.beginPath();
+        c.roundRect(-3, 0, 6, 12, 3);
+        c.fill();
+        c.stroke();
+        c.restore();
+
+        // 4. Big Cute Chibi Head
+        const headY = -28 + Math.abs(Math.sin(st.walkPhase)) * -1.8;
+        c.save();
+        c.translate(0, headY);
+
+        // Back hair for twin pigtails (hairStyle === 1)
+        if (st.hairStyle === 1) {
+          c.fillStyle = st.hairColor;
+          c.beginPath();
+          c.arc(-18, -2, 7, 0, Math.PI * 2);
+          c.arc(18, -2, 7, 0, Math.PI * 2);
+          c.fill();
+          c.stroke();
+        }
+
+        // Face circle
+        c.fillStyle = '#FFE4C4';
+        c.beginPath();
+        c.arc(0, 0, 16.5, 0, Math.PI * 2);
+        c.fill();
+        c.stroke();
+
+        // Rosy Pink Cheeks
+        c.fillStyle = 'rgba(251, 113, 133, 0.55)';
+        c.beginPath();
+        c.ellipse(-9.5, 3.5, 3.8, 2.2, 0, 0, Math.PI * 2);
+        c.ellipse(9.5, 3.5, 3.8, 2.2, 0, 0, Math.PI * 2);
+        c.fill();
+
+        // Expressive Cartoon Eyes & Mouth (combining ufo-only panic face details)
+        if (isAbducted || isPanicFun) {
+          // Wide comical eyes with tiny pupils
+          c.fillStyle = '#FFFFFF';
+          c.beginPath();
+          c.arc(-6, -1.5, 4.5, 0, Math.PI * 2);
+          c.arc(6, -1.5, 4.5, 0, Math.PI * 2);
+          c.fill();
+          c.stroke();
+
+          c.fillStyle = '#0F172A';
+          c.beginPath();
+          c.arc(-6, -1.5, 1.8, 0, Math.PI * 2);
+          c.arc(6, -1.5, 1.8, 0, Math.PI * 2);
+          c.fill();
+
+          // Expressive angled panic eyebrows (from ufo-only)
+          c.strokeStyle = '#475569';
+          c.lineWidth = 2.0;
+          c.beginPath();
+          c.moveTo(-10, -6.5);
+          c.lineTo(-3, -8.5);
+          c.moveTo(3, -8.5);
+          c.lineTo(10, -6.5);
+          c.stroke();
+
+          // Comical surprised O mouth + cute pink tongue inside
+          c.fillStyle = '#BE123C';
+          c.strokeStyle = '#1E293B';
+          c.lineWidth = 1.8;
+          c.beginPath();
+          c.ellipse(0, 6.5, isAbducted ? 4.8 : 3.6, isAbducted ? 5.6 : 4.2, 0, 0, Math.PI * 2);
+          c.fill();
+          c.stroke();
+
+          c.fillStyle = '#FDA4AF';
+          c.beginPath();
+          c.ellipse(0, 8.2, isAbducted ? 3.0 : 2.2, 1.8, 0, 0, Math.PI * 2);
+          c.fill();
+
+          // Flying blue sweat drop when abducted (from ufo-only)
+          if (isAbducted) {
+            c.fillStyle = '#38BDF8';
+            c.beginPath();
+            c.ellipse(20, -6, 2.6, 5.2, 0.25, 0, Math.PI * 2);
+            c.fill();
+          }
+        } else if (isCheer) {
+          // Happy ^ ^ laughing eyes + big smile
+          c.strokeStyle = '#0F172A';
+          c.lineWidth = 2.4;
+          c.beginPath();
+          c.arc(-6, -1, 3.5, Math.PI, 0);
+          c.stroke();
+          c.beginPath();
+          c.arc(6, -1, 3.5, Math.PI, 0);
+          c.stroke();
+
+          c.fillStyle = '#F43F5E';
+          c.beginPath();
+          c.arc(0, 4.5, 4.5, 0, Math.PI);
+          c.fill();
+          c.stroke();
+        } else {
+          // Normal cute shiny anime/chibi eyes + happy smile
+          c.fillStyle = '#0F172A';
+          c.beginPath();
+          c.arc(-6, -1.5, 2.7, 0, Math.PI * 2);
+          c.arc(6, -1.5, 2.7, 0, Math.PI * 2);
+          c.fill();
+
+          // Eye sparkle
+          c.fillStyle = '#FFFFFF';
+          c.beginPath();
+          c.arc(-6.8, -2.5, 1.0, 0, Math.PI * 2);
+          c.arc(5.2, -2.5, 1.0, 0, Math.PI * 2);
+          c.fill();
+
+          // Cute smile
+          c.strokeStyle = '#0F172A';
+          c.lineWidth = 2;
+          c.beginPath();
+          c.arc(0, 3.5, 3.8, 0.15 * Math.PI, 0.85 * Math.PI);
+          c.stroke();
+        }
+
+        // 5. Front Hairstyles
+        c.fillStyle = st.hairColor;
+        c.strokeStyle = '#1E293B';
+        c.lineWidth = 2;
+        c.beginPath();
+        c.arc(0, -3, 17, Math.PI * 1.05, Math.PI * 1.95);
+        if (st.hairStyle === 0) {
+          // Spiky bangs
+          c.lineTo(10, -8);
+          c.lineTo(5, -13);
+          c.lineTo(0, -7);
+          c.lineTo(-6, -13);
+          c.lineTo(-12, -8);
+        } else if (st.hairStyle === 3) {
+          // Curly top bun
+          c.arc(0, -19, 7, 0, Math.PI * 2);
+        }
+        c.closePath();
+        c.fill();
+        c.stroke();
+
+        // 6. Cute Accessories (Glasses, Cap, Sprout, Bow)
+        if (st.accessory === 1) {
+          // Round glasses
+          c.strokeStyle = '#0284C7';
+          c.lineWidth = 1.8;
+          c.beginPath();
+          c.arc(-6, -1.5, 4.8, 0, Math.PI * 2);
+          c.arc(6, -1.5, 4.8, 0, Math.PI * 2);
+          c.moveTo(-1.2, -1.5);
+          c.lineTo(1.2, -1.5);
+          c.stroke();
+        } else if (st.accessory === 2) {
+          // Sunny yellow school cap
+          c.fillStyle = '#FACC15';
+          c.strokeStyle = '#1E293B';
+          c.beginPath();
+          c.arc(0, -8, 15, Math.PI, 0);
+          c.fill();
+          c.stroke();
+          c.beginPath();
+          c.roundRect(0, -11, 19, 4.5, 2);
+          c.fill();
+          c.stroke();
+        } else if (st.accessory === 3) {
+          // Little green leaf sprout on head (Mầm cây dễ thương)
+          c.strokeStyle = '#15803D';
+          c.lineWidth = 2;
+          c.beginPath();
+          c.moveTo(0, -18);
+          c.quadraticCurveTo(2, -26, 6, -26);
+          c.stroke();
+          c.fillStyle = '#4ADE80';
+          c.beginPath();
+          c.ellipse(7, -26, 5, 3, -0.3, 0, Math.PI * 2);
+          c.fill();
+        } else if (st.accessory === 4) {
+          // Pink hair ribbon bow
+          c.fillStyle = '#FB7185';
+          c.beginPath();
+          c.arc(-9, -15, 4.5, 0, Math.PI * 2);
+          c.arc(-2, -15, 4.5, 0, Math.PI * 2);
+          c.fill();
+        }
+
+        c.restore(); // end head
+        c.restore(); // end student
+      }
+
+      /**
+       * Draws the rising golden name badge & "Áaaa!" exclamation attached to the
+       * abducted student so it rises and shrinks right into the UFO with them (like ufo-only).
+       */
+      function drawAbductingStudentOverlay(c, st) {
+        if (!st || st.scale <= 0.14) return;
+        const drawX = st.x;
+        const drawY = st.y - st.z;
+        const alpha = Math.min(1, (st.scale - 0.14) / 0.28);
+        const uiScale = Math.max(0.55, Math.min(1, st.scale * 1.05));
+
+        c.save();
+        c.globalAlpha = alpha;
+        c.translate(drawX, drawY);
+        c.scale(uiScale, uiScale);
+
+        // 1. Floating "Áaaa!" panic text above head (from ufo-only)
+        c.font = '900 15px "Nunito", sans-serif';
+        c.textAlign = 'center';
+        c.textBaseline = 'middle';
+        const shoutX = Math.sin(stateTimer * 12) * 5;
+        const shoutY = -62 * st.scale - 14;
+        c.strokeStyle = '#FFFFFF';
+        c.lineWidth = 4;
+        c.strokeText('Áaaa! 🛸', shoutX, shoutY);
+        c.fillStyle = '#E11D48';
+        c.fillText('Áaaa! 🛸', shoutX, shoutY);
+
+        // 2. Attached Golden Name Pill right below student's feet
+        c.font = '900 13px "Nunito", sans-serif';
+        const textW = c.measureText(st.name).width;
+        const boxW = textW + 18;
+        const boxH = 24;
+        const by = 18 * st.scale + 4;
+
+        c.fillStyle = '#FEF08A';
+        c.strokeStyle = '#E11D48';
+        c.lineWidth = 2.4;
+        c.beginPath();
+        c.roundRect(-boxW * 0.5, by, boxW, boxH, 999);
+        c.fill();
+        c.stroke();
+
+        c.fillStyle = '#BE123C';
+        c.fillText(st.name, 0, by + boxH * 0.5 + 0.5);
+        c.restore();
+      }
+
+      function drawTractorBeamBack(c) {
+        const topW = 48;
+        const botW = 148 * ufo.beamProgress;
+        const beamTopY = ufo.y + 14;
+        const anchorX = chosenStudent ? chosenStudent.abductAnchorX : ufo.x;
+        const beamBotY = chosenStudent ? (chosenStudent.abductAnchorY + 18) : (ufo.y + 230);
+
+        c.save();
+        // Outer warm golden-cyan tractor beam cone (blending ufo-only & vibrant glow)
+        const beamGrad = c.createLinearGradient(ufo.x, beamTopY, anchorX, beamBotY);
+        beamGrad.addColorStop(0, 'rgba(254, 240, 138, 0.85)');
+        beamGrad.addColorStop(0.35, 'rgba(34, 211, 238, 0.58)');
+        beamGrad.addColorStop(0.75, 'rgba(168, 85, 247, 0.35)');
+        beamGrad.addColorStop(1, 'rgba(254, 249, 195, 0.12)');
+
+        c.fillStyle = beamGrad;
+        c.beginPath();
+        c.moveTo(ufo.x - topW * 0.5, beamTopY);
+        c.lineTo(ufo.x + topW * 0.5, beamTopY);
+        c.lineTo(anchorX + botW * 0.5, beamBotY);
+        c.lineTo(anchorX - botW * 0.5, beamBotY);
+        c.closePath();
+        c.fill();
+
+        // Inner bright suction core
+        const coreGrad = c.createLinearGradient(ufo.x, beamTopY, anchorX, beamBotY);
+        coreGrad.addColorStop(0, 'rgba(255, 255, 255, 0.72)');
+        coreGrad.addColorStop(0.6, 'rgba(254, 240, 138, 0.32)');
+        coreGrad.addColorStop(1, 'rgba(255, 255, 255, 0.0)');
+        c.fillStyle = coreGrad;
+        c.beginPath();
+        c.moveTo(ufo.x - topW * 0.26, beamTopY);
+        c.lineTo(ufo.x + topW * 0.26, beamTopY);
+        c.lineTo(anchorX + botW * 0.25, beamBotY);
+        c.lineTo(anchorX - botW * 0.25, beamBotY);
+        c.closePath();
+        c.fill();
+        c.restore();
+      }
+
+      function drawTractorBeamFront(c) {
+        const topW = 48;
+        const botW = 148 * ufo.beamProgress;
+        const beamTopY = ufo.y + 14;
+        const anchorX = chosenStudent ? chosenStudent.abductAnchorX : ufo.x;
+        const beamBotY = chosenStudent ? (chosenStudent.abductAnchorY + 18) : (ufo.y + 230);
+        const beamHeight = Math.max(60, beamBotY - beamTopY);
+
+        c.save();
+        // 1. Rising energy rings that shrink as they travel up into the UFO nozzle
+        c.strokeStyle = 'rgba(255, 255, 255, 0.78)';
+        c.lineWidth = 2.4;
+        for (let r = 0; r < 5; r++) {
+          const frac = ((ufo.lightPhase * 0.28 + r * 0.2) % 1);
+          const ry = beamBotY - frac * beamHeight;
+          const rxCenter = anchorX + (ufo.x - anchorX) * frac;
+          const rw = (topW * 0.45) * frac + (botW * 0.46) * (1 - frac);
+          c.globalAlpha = Math.sin(frac * Math.PI) * 0.85 * ufo.beamProgress;
+          c.beginPath();
+          c.ellipse(rxCenter, ry, Math.max(4, rw), Math.max(2.5, 9 * (1 - frac * 0.5)), 0, 0, Math.PI * 2);
+          c.stroke();
+        }
+
+        // 2. 22 Rising Sparkle Motes spiraling up into the UFO (from ufo-only!)
+        c.globalAlpha = 0.9 * ufo.beamProgress;
+        for (let i = 0; i < 22; i++) {
+          const pFrac = ((stateTimer * 0.85 + i * 0.09) % 1);
+          const py = beamBotY - pFrac * beamHeight;
+          const coneHalfW = ((topW * 0.4) * pFrac + (botW * 0.42) * (1 - pFrac));
+          const pxCenter = anchorX + (ufo.x - anchorX) * pFrac;
+          const px = pxCenter + Math.sin(i * 12.3 + stateTimer * 5) * coneHalfW * 0.82;
+          c.fillStyle = i % 2 === 0 ? '#FEF9C3' : '#A5F3FC';
+          c.beginPath();
+          c.ellipse(px, py, 2.4, 4.5, 0, 0, Math.PI * 2);
+          c.fill();
+        }
+        c.restore();
+      }
+
+      /**
+       * Draws the Cute Pastel UFO + Mischievous Little Green Alien inside the Glass Dome
+       * + Miniature Abducted Student peeking inside the dome once sucked in!
+       */
+      function drawCuteUfo(c) {
+        c.save();
+        c.translate(ufo.x, ufo.y);
+        c.rotate(ufo.tilt);
+
+        // Happy squash-and-stretch bounce when swallowing the student into the UFO!
+        if (ufo.swallowBounce > 0) {
+          const b = Math.sin(ufo.swallowBounce * Math.PI * 3) * ufo.swallowBounce * 0.16;
+          c.scale(1 + b, 1 - b * 0.85);
+        }
+
+        // 1. Bottom Tractor Emitter Nozzle (glows bright golden-cyan during abduction)
+        c.fillStyle = ufo.beamProgress > 0.1 ? '#FDE047' : '#06B6D4';
+        c.strokeStyle = '#0F172A';
+        c.lineWidth = 3;
+        c.beginPath();
+        c.arc(0, 14, 19, 0, Math.PI);
+        c.fill();
+        c.stroke();
+
+        // 2. Glass Cockpit Dome (Background tint)
+        c.fillStyle = 'rgba(186, 230, 253, 0.68)';
+        c.beginPath();
+        c.arc(0, -4, 40, Math.PI, 0);
+        c.fill();
+
+        // 3. Cute Mischievous Green Alien (+ Captured Student inside Dome if sucked in!)
+        const hasPassenger = Boolean(ufo.capturedStudent);
+        c.save();
+        c.translate(hasPassenger ? -11 : 0, -10);
+        if (hasPassenger) c.scale(0.88, 0.88);
+
+        // Alien antennae
+        c.strokeStyle = '#15803D';
+        c.lineWidth = 2.5;
+        c.beginPath();
+        c.moveTo(-8, -14);
+        c.lineTo(-13, -24);
+        c.moveTo(8, -14);
+        c.lineTo(13, -24);
+        c.stroke();
+        c.fillStyle = '#FACC15';
+        c.beginPath();
+        c.arc(-13, -24, 3.5, 0, Math.PI * 2);
+        c.arc(13, -24, 3.5, 0, Math.PI * 2);
+        c.fill();
+
+        // Alien head
+        c.fillStyle = '#4ADE80';
+        c.strokeStyle = '#166534';
+        c.lineWidth = 2;
+        c.beginPath();
+        c.ellipse(0, -2, 16, 13, 0, 0, Math.PI * 2);
+        c.fill();
+        c.stroke();
+
+        // Alien 3 cute eyes
+        c.fillStyle = '#0F172A';
+        c.beginPath();
+        c.arc(-6, -4, 2.8, 0, Math.PI * 2);
+        c.arc(6, -4, 2.8, 0, Math.PI * 2);
+        c.arc(0, -8, 2.2, 0, Math.PI * 2);
+        c.fill();
+
+        // Mischievous cheeky smile
+        c.strokeStyle = '#166534';
+        c.lineWidth = 2;
+        c.beginPath();
+        c.arc(0, 1, 6, 0.1 * Math.PI, 0.9 * Math.PI);
+        c.stroke();
+        c.restore();
+
+        // 3b. Draw miniature captured student peeking out inside the UFO dome!
+        if (ufo.capturedStudent) {
+          const cap = ufo.capturedStudent;
+          c.save();
+          c.translate(14, -10);
+          // Mini torso
+          c.fillStyle = cap.shirtColor;
+          c.strokeStyle = '#0F172A';
+          c.lineWidth = 1.8;
+          c.beginPath();
+          c.roundRect(-8, 1, 16, 10, 4);
+          c.fill();
+          c.stroke();
+          // Mini head
+          c.fillStyle = '#FFE4C4';
+          c.beginPath();
+          c.arc(0, -4, 10.5, 0, Math.PI * 2);
+          c.fill();
+          c.stroke();
+          // Mini hair
+          c.fillStyle = cap.hairColor;
+          c.beginPath();
+          c.arc(0, -6, 10.8, Math.PI * 1.05, Math.PI * 1.95);
+          c.closePath();
+          c.fill();
+          c.stroke();
+          // Mini surprised eyes & mouth
+          c.fillStyle = '#0F172A';
+          c.beginPath();
+          c.arc(-3.8, -4.5, 1.6, 0, Math.PI * 2);
+          c.arc(3.8, -4.5, 1.6, 0, Math.PI * 2);
+          c.fill();
+          c.fillStyle = '#E11D48';
+          c.beginPath();
+          c.arc(0, -0.5, 2.5, 0, Math.PI * 2);
+          c.fill();
+          c.restore();
+        }
+
+        // Glass Dome specular highlight & outline
+        c.strokeStyle = '#0F172A';
+        c.lineWidth = 3;
+        c.beginPath();
+        c.arc(0, -4, 40, Math.PI, 0);
+        c.stroke();
+        c.strokeStyle = 'rgba(255, 255, 255, 0.85)';
+        c.lineWidth = 3.5;
+        c.beginPath();
+        c.arc(0, -4, 33, Math.PI * 1.15, Math.PI * 1.55);
+        c.stroke();
+
+        // 4. Main Pastel Flying Saucer Disc (with soft outer glow from ufo-only)
+        c.save();
+        c.shadowColor = '#FEF08A';
+        c.shadowBlur = ufo.beamProgress > 0.1 ? 26 : 14;
+        const saucerGrad = c.createLinearGradient(-68, -8, 68, 16);
+        saucerGrad.addColorStop(0, '#A855F7');
+        saucerGrad.addColorStop(0.5, '#EC4899');
+        saucerGrad.addColorStop(1, '#F59E0B');
+
+        c.fillStyle = saucerGrad;
+        c.strokeStyle = '#0F172A';
+        c.lineWidth = 3;
+        c.beginPath();
+        c.ellipse(0, 2, 66, 17, 0, 0, Math.PI * 2);
+        c.fill();
+        c.stroke();
+        c.restore();
+
+        // 5. Blinking Candy Lights around Saucer Rim
+        const lightColors = ['#FEF08A', '#67E8F9', '#86EFAC', '#FDE047', '#F9A8D4'];
+        for (let i = -2; i <= 2; i++) {
+          const lx = i * 22;
+          const ly = 3 + Math.cos(i * 0.5) * 3;
+          const activeIdx = Math.floor(ufo.lightPhase + i + 10) % lightColors.length;
+          c.fillStyle = lightColors[activeIdx];
+          c.strokeStyle = '#0F172A';
+          c.lineWidth = 1.8;
+          c.beginPath();
+          c.arc(lx, ly, 5.2, 0, Math.PI * 2);
+          c.fill();
+          c.stroke();
+        }
+
+        c.restore();
+      }
+
+      function drawStudentNameTag(c, st) {
+        c.save();
+        c.font = '800 12px "Nunito", sans-serif';
+        const textW = c.measureText(st.name).width;
+        const padX = 8;
+        const boxW = textW + padX * 2;
+        const boxH = 20;
+        const bx = st.labelX - boxW * 0.5;
+        const by = st.labelY - boxH * 0.5;
+
+        // Subtle tether line if label was pushed slightly away from student feet
+        const distSq = (st.labelX - st.x) ** 2 + (st.labelY - (st.y + 25)) ** 2;
+        if (distSq > 140) {
+          c.strokeStyle = 'rgba(100, 116, 139, 0.45)';
+          c.lineWidth = 1.2;
+          c.beginPath();
+          c.moveTo(st.x, st.y + 14);
+          c.lineTo(st.labelX, st.labelY - boxH * 0.4);
+          c.stroke();
+        }
+
+        c.fillStyle = 'rgba(255, 255, 255, 0.94)';
+        c.strokeStyle = '#38BDF8';
+        c.lineWidth = 1.6;
+        c.beginPath();
+        c.roundRect(bx, by, boxW, boxH, 999);
+        c.fill();
+        c.stroke();
+
+        c.fillStyle = '#0F172A';
+        c.textAlign = 'center';
+        c.textBaseline = 'middle';
+        c.fillText(st.name, st.labelX, st.labelY + 0.5);
+        c.restore();
+      }
+
+      function drawSpeechBubble(c, st) {
+        c.save();
+        c.font = '800 11px "Nunito", sans-serif';
+        const tw = c.measureText(st.speechText).width;
+        const bw = tw + 14;
+        const bh = 20;
+        const bx = st.x - bw * 0.5;
+        const by = st.y - st.z - 68;
+
+        c.fillStyle = '#FFFBEB';
+        c.strokeStyle = '#F59E0B';
+        c.lineWidth = 1.8;
+        c.beginPath();
+        c.roundRect(bx, by, bw, bh, 8);
+        c.fill();
+        c.stroke();
+
+        c.fillStyle = '#92400E';
+        c.textAlign = 'center';
+        c.textBaseline = 'middle';
+        c.fillText(st.speechText, st.x, by + bh * 0.5 + 0.5);
+        c.restore();
+      }
+
+      function drawWinnerAvatarPortrait(st) {
+        const avCanvas = document.getElementById('winnerAvatarCanvas');
+        if (!avCanvas || !st) return;
+        const ac = avCanvas.getContext('2d');
+        ac.clearRect(0, 0, 180, 180);
+
+        const clone = Object.assign({}, st, {
+          x: 90,
+          y: 128,
+          z: 0,
+          rotation: -0.08,
+          scale: 1,
+          facing: 1,
+          expression: 'abducted',
+          hasRightShoe: false,
+          walkPhase: 1.2
+        });
+        drawChibiStudent(ac, clone, 2.15);
+      }
+
+      function spawnCelebrationConfetti() {
+        const colors = ['#FF6B8B', '#4ECDC4', '#FACC15', '#A855F7', '#3B82F6', '#10B981'];
+        for (let i = 0; i < 55; i++) {
+          confettiParticles.push({
+            x: cw * 0.5 + (Math.random() - 0.5) * 180,
+            y: ch * 0.35,
+            vx: (Math.random() - 0.5) * 380,
+            vy: -120 - Math.random() * 240,
+            rot: Math.random() * Math.PI * 2,
+            vRot: (Math.random() - 0.5) * 12,
+            color: colors[i % colors.length],
+            life: 2.5 + Math.random() * 1.5
+          });
+        }
+      }
+
+      // =========================================================================
+      // 7. LOCAL STORAGE & CLASSROOM UI HANDLERS
+      // =========================================================================
+      function loadStateFromStorage() {
+        try {
+          const savedList = localStorage.getItem(STORAGE_KEY_STUDENTS);
+          if (savedList) {
+            const parsed = JSON.parse(savedList);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              allStudentNames = parsed;
+            }
+          }
+          const savedCalled = localStorage.getItem(STORAGE_KEY_CALLED);
+          if (savedCalled) {
+            const parsedC = JSON.parse(savedCalled);
+            if (Array.isArray(parsedC)) {
+              calledStudentNames = parsedC;
+            }
+          }
+          const savedNoRepeat = localStorage.getItem(STORAGE_KEY_NOREPEAT);
+          if (savedNoRepeat !== null) {
+            noRepeatMode = savedNoRepeat === 'true';
+          }
+          const savedTheme = localStorage.getItem(STORAGE_KEY_THEME);
+          if (savedTheme && YARD_THEME_ORDER.includes(savedTheme)) {
+            currentYardTheme = savedTheme;
+          }
+        } catch (err) {}
+
+        if (allStudentNames.length === 0) {
+          allStudentNames = [...DEFAULT_STUDENTS];
+        }
+        document.getElementById('chkNoRepeat').checked = noRepeatMode;
+        document.getElementById('txtStudentList').value = allStudentNames.join('\n');
+        const selTheme = document.getElementById('selectYardTheme');
+        if (selTheme) selTheme.value = currentYardTheme;
+        updateDrawerLineCount();
+      }
+
+      function saveStateToStorage() {
+        try {
+          localStorage.setItem(STORAGE_KEY_STUDENTS, JSON.stringify(allStudentNames));
+          localStorage.setItem(STORAGE_KEY_CALLED, JSON.stringify(calledStudentNames));
+          localStorage.setItem(STORAGE_KEY_NOREPEAT, String(noRepeatMode));
+          localStorage.setItem(STORAGE_KEY_THEME, currentYardTheme);
+        } catch (err) {}
+      }
+
+      function updateTopCountersUI() {
+        const avail = getAvailableStudents().length;
+        document.getElementById('remainingCountBadge').textContent = String(avail);
+        document.getElementById('totalCountBadge').textContent = String(allStudentNames.length);
+        document.getElementById('calledCountBadge').textContent = String(calledStudentNames.length);
+        document.getElementById('historyCountLabel').textContent = String(calledStudentNames.length);
+      }
+
+      function updateDrawerLineCount() {
+        const raw = document.getElementById('txtStudentList').value || '';
+        const lines = raw.split(/\r?\n/).map((s) => s.trim()).filter(Boolean);
+        document.getElementById('drawerLineCount').textContent = `${lines.length} học sinh`;
+      }
+
+      function renderCalledHistoryList() {
+        const container = document.getElementById('calledHistoryList');
+        if (!container) return;
+        if (calledStudentNames.length === 0) {
+          container.innerHTML = `
+            <div class="text-xs text-slate-400 italic py-2 text-center">
+              Chưa có học sinh nào bị UFO bắt trong vòng này.
+            </div>
+          `;
+          return;
+        }
+        container.innerHTML = calledStudentNames.map((name, idx) => `
+          <div class="flex items-center justify-between bg-white px-3 py-1.5 rounded-xl border border-slate-200 text-xs font-bold">
+            <div class="flex items-center gap-2">
+              <span class="w-5 h-5 rounded-full bg-rose-100 text-rose-700 font-extrabold flex items-center justify-center text-[11px]">${idx + 1}</span>
+              <span class="text-slate-800">${escapeHtml(name)}</span>
+            </div>
+            <span class="text-[10px] text-emerald-600 font-extrabold">Đã lên bảng ✓</span>
+          </div>
+        `).join('');
+      }
+
+      function escapeHtml(str) {
+        return String(str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      }
+
+      function resetRound() {
+        if (gameState === 'CHASING' || gameState === 'ABDUCTING') return;
+        calledStudentNames = [];
+        chosenStudent = null;
+        ufo.capturedStudent = null;
+        droppedShoes = [];
+        hatchSparkles = [];
+        gameState = 'IDLE';
+        document.getElementById('winnerOverlay').classList.add('hidden');
+        document.getElementById('lastCalledMini').textContent = 'Chưa có ai';
+        saveStateToStorage();
+        rebuildSchoolyardEntities();
+        renderCalledHistoryList();
+        updatePhaseBanner(
+          '🛸✨',
+          'Đã bắt đầu vòng mới! Tất cả học sinh đã xuống sân!',
+          'Bấm "Bắt một bạn nào!" hoặc phím SPACE để UFO truy tìm ngẫu nhiên nhé!'
+        );
+      }
+
+      function continueToNextTurn() {
+        document.getElementById('winnerOverlay').classList.add('hidden');
+        gameState = 'IDLE';
+        chosenStudent = null;
+        syncSchoolyardEntitiesWithoutTeleport();
+        updatePhaseBanner(
+          '🛸',
+          'UFO đang lượn lờ ngắm sân trường...',
+          'Bấm "Bắt một bạn nào!" hoặc phím SPACE để gọi bạn tiếp theo lên bảng!'
+        );
+      }
+
+      // =========================================================================
+      // 8. EVENT LISTENERS & INITIALIZATION
+      // =========================================================================
+      function bindEvents() {
+        // Global first-tap audio unlocker for Safari iOS & modern browsers
+        ['pointerdown', 'touchstart', 'keydown'].forEach((evtName) => {
+          window.addEventListener(evtName, () => {
+            if (!audioUnlocked) unlockAudioOnUserGesture();
+          }, { passive: true });
+        });
+
+        // Keyboard shortcuts: SPACE to catch / continue (from ufo-only), ESC to close modals
+        window.addEventListener('keydown', (e) => {
+          const tag = (document.activeElement && document.activeElement.tagName) || '';
+          if (['TEXTAREA', 'INPUT', 'SELECT'].includes(tag)) return;
+
+          if (e.code === 'Space') {
+            const audioModal = document.getElementById('audioStudioModal');
+            if (audioModal && !audioModal.classList.contains('hidden')) return;
+            e.preventDefault();
+            if (gameState === 'RESULT') {
+              continueToNextTurn();
+            } else if (gameState === 'IDLE') {
+              startCatchSequence();
+            }
+          } else if (e.code === 'Escape') {
+            const audioModal = document.getElementById('audioStudioModal');
+            const sideDrawer = document.getElementById('sideDrawer');
+            if (audioModal && !audioModal.classList.contains('hidden')) {
+              stopAllActiveAudio();
+              audioModal.classList.add('hidden');
+            } else if (sideDrawer && !sideDrawer.classList.contains('hidden')) {
+              sideDrawer.classList.add('hidden');
+              resizeCanvas();
+            }
+          }
+        });
+
+        document.getElementById('btnUnlockAudioBanner').addEventListener('click', () => {
+          unlockAudioOnUserGesture();
+          playShortEvaluationMix();
+        });
+
+        // Main CTA: "Bắt một bạn nào!"
+        document.getElementById('btnTriggerCatch').addEventListener('click', () => {
+          startCatchSequence();
+        });
+
+        // Clicking directly on canvas when IDLE also lets teacher poke the UFO or students
+        canvas.addEventListener('click', (e) => {
+          unlockAudioOnUserGesture();
+          if (gameState !== 'IDLE') return;
+          const rect = canvas.getBoundingClientRect();
+          const clickX = e.clientX - rect.left;
+          const clickY = e.clientY - rect.top;
+          // Make nearby students hop and giggle!
+          studentEntities.forEach((st) => {
+            const d = Math.hypot(st.x - clickX, st.y - clickY);
+            if (d < 85) {
+              st.jumpTimer = 0.34;
+              st.speechText = 'Ahihi! 🛸';
+              st.speechTimer = 1.2;
+            }
+          });
+        });
+
+        // Winner Overlay Buttons
+        document.getElementById('btnContinueNext').addEventListener('click', continueToNextTurn);
+
+        document.getElementById('btnPutBackStudent').addEventListener('click', () => {
+          if (chosenStudent) {
+            const idx = calledStudentNames.indexOf(chosenStudent.name);
+            if (idx !== -1) calledStudentNames.splice(idx, 1);
+            saveStateToStorage();
+          }
+          ufo.capturedStudent = null;
+          document.getElementById('winnerOverlay').classList.add('hidden');
+          gameState = 'IDLE';
+          chosenStudent = null;
+          syncSchoolyardEntitiesWithoutTeleport();
+          renderCalledHistoryList();
+          updatePhaseBanner(
+            '↩️🛸',
+            'Đã thả bạn xuống lại sân trường!',
+            'Bấm "Bắt một bạn nào!" hoặc phím SPACE để UFO chọn lại nhé!'
+          );
+        });
+
+        // Quick & Drawer Reset Round
+        document.getElementById('btnResetRoundQuick').addEventListener('click', resetRound);
+        document.getElementById('btnResetRoundDrawer').addEventListener('click', resetRound);
+
+        // Drawer Toggle
+        const sideDrawer = document.getElementById('sideDrawer');
+        document.getElementById('btnToggleDrawer').addEventListener('click', () => {
+          sideDrawer.classList.toggle('hidden');
+          resizeCanvas();
+        });
+        document.getElementById('btnCloseDrawer').addEventListener('click', () => {
+          sideDrawer.classList.add('hidden');
+          resizeCanvas();
+        });
+
+        // Student List Input & Save
+        document.getElementById('txtStudentList').addEventListener('input', updateDrawerLineCount);
+
+        document.getElementById('btnApplyStudentList').addEventListener('click', () => {
+          const raw = document.getElementById('txtStudentList').value || '';
+          const cleaned = raw.split(/\r?\n/).map((s) => s.trim()).filter(Boolean);
+          if (cleaned.length > 0) {
+            allStudentNames = cleaned;
+            // Remove any called names no longer in list
+            calledStudentNames = calledStudentNames.filter((n) => allStudentNames.includes(n));
+            saveStateToStorage();
+            rebuildSchoolyardEntities();
+            renderCalledHistoryList();
+            const toast = document.getElementById('saveToastMsg');
+            toast.classList.remove('hidden');
+            setTimeout(() => toast.classList.add('hidden'), 3000);
+          }
+        });
+
+        document.getElementById('btnLoadSampleClass').addEventListener('click', () => {
+          allStudentNames = [...DEFAULT_STUDENTS];
+          calledStudentNames = [];
+          document.getElementById('txtStudentList').value = allStudentNames.join('\n');
+          updateDrawerLineCount();
+          saveStateToStorage();
+          rebuildSchoolyardEntities();
+          renderCalledHistoryList();
+        });
+
+        document.getElementById('chkNoRepeat').addEventListener('change', (e) => {
+          noRepeatMode = e.target.checked;
+          saveStateToStorage();
+          rebuildSchoolyardEntities();
+        });
+
+        // Schoolyard Theme Selector & Quick Cycle Button
+        const selThemeEl = document.getElementById('selectYardTheme');
+        if (selThemeEl) {
+          selThemeEl.addEventListener('change', (e) => {
+            if (YARD_THEME_ORDER.includes(e.target.value)) {
+              currentYardTheme = e.target.value;
+              saveStateToStorage();
+            }
+          });
+        }
+        const btnCycleTheme = document.getElementById('btnCycleYardTheme');
+        if (btnCycleTheme) {
+          btnCycleTheme.addEventListener('click', () => {
+            const idx = YARD_THEME_ORDER.indexOf(currentYardTheme);
+            const nextIdx = (idx + 1) % YARD_THEME_ORDER.length;
+            currentYardTheme = YARD_THEME_ORDER[nextIdx];
+            if (selThemeEl) selThemeEl.value = currentYardTheme;
+            saveStateToStorage();
+          });
+        }
+
+        // Audio Controls (Mute, Master Volume, UFO Balance, Studio Modal)
+        document.getElementById('btnToggleMute').addEventListener('click', () => {
+          unlockAudioOnUserGesture();
+          isMuted = !isMuted;
+          if (isMuted) stopAllActiveAudio();
+          updateAudioStatusUI();
+        });
+
+        document.getElementById('sliderMasterVol').addEventListener('input', (e) => {
+          unlockAudioOnUserGesture();
+          masterVolume = Number(e.target.value) / 100;
+          isMuted = masterVolume === 0;
+          document.getElementById('labelMasterVol').textContent = `${e.target.value}%`;
+          updateAudioStatusUI();
+        });
+
+        document.getElementById('sliderUfoBalance').addEventListener('input', (e) => {
+          ufoGainRatio = Number(e.target.value) / 100;
+          document.getElementById('labelUfoBalance').textContent = `${e.target.value}%`;
+        });
+
+        // Quick Preview Audio Button & Modal
+        document.getElementById('btnQuickPreviewAudio').addEventListener('click', () => {
+          playShortEvaluationMix();
+        });
+
+        const audioModal = document.getElementById('audioStudioModal');
+        document.getElementById('btnOpenAudioModal').addEventListener('click', () => {
+          unlockAudioOnUserGesture();
+          audioModal.classList.remove('hidden');
+        });
+        document.getElementById('btnCloseAudioModal').addEventListener('click', () => {
+          stopAllActiveAudio();
+          audioModal.classList.add('hidden');
+        });
+        document.getElementById('btnDoneAudioModal').addEventListener('click', () => {
+          stopAllActiveAudio();
+          audioModal.classList.add('hidden');
+        });
+
+        document.getElementById('btnPlayFullDemoMix').addEventListener('click', () => {
+          playShortEvaluationMix();
+        });
+        document.getElementById('btnStopAllAudio').addEventListener('click', () => {
+          stopAllActiveAudio();
+          document.getElementById('txtPlayFullDemoMix').textContent = 'Nghe đoạn phối thử (4.5s)';
+        });
+
+        // Individual Layer Test Buttons
+        document.querySelectorAll('.btn-test-layer').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            unlockAudioOnUserGesture();
+            stopAllActiveAudio();
+            const layer = btn.getAttribute('data-test-layer');
+            if (layer === 'crowd' || layer === 'laugh' || layer === 'abductVocal') {
+              if (customAudioBlobs[layer]) {
+                playRealClipLayer(layer, { volume: 0.9, maxDurationMs: 3200 });
+              }
+            } else if (layer === 'ufoBeam') {
+              const ctx = getAudioContext();
+              if (ctx) {
+                playGentleUfoHover(ctx, 2.0);
+                playTractorBeamAndVictoryChime(ctx);
+              }
+            }
+          });
+        });
+
+        // Custom Audio File Replacement Inputs
+        document.querySelectorAll('.input-replace-audio').forEach((inp) => {
+          inp.addEventListener('change', (e) => {
+            const file = e.target.files && e.target.files[0];
+            if (!file) return;
+            const layer = inp.getAttribute('data-replace-layer');
+            const blobUrl = URL.createObjectURL(file);
+            customAudioBlobs[layer] = blobUrl;
+            const badge = document.getElementById(`customBadge-${layer}`);
+            if (badge) {
+              badge.textContent = `✅ Đang dùng file của bạn: ${file.name}`;
+              badge.classList.remove('hidden');
+            }
+            // Play immediately so teacher can verify their custom sound
+            playRealClipLayer(layer, { volume: 0.85, maxDurationMs: 3500 });
+          });
+        });
+
+        document.getElementById('btnResetDefaultSounds').addEventListener('click', () => {
+          Object.keys(customAudioBlobs).forEach((k) => {
+            customAudioBlobs[k] = null;
+            const badge = document.getElementById(`customBadge-${k}`);
+            if (badge) badge.classList.add('hidden');
+          });
+        });
+
+        // Fullscreen Toggle (with fallback for sandboxed iframes & iPhone Safari)
+        document.getElementById('btnFullscreen').addEventListener('click', () => {
+          const root = document.getElementById('appRoot');
+          const isFull = document.fullscreenElement || document.webkitFullscreenElement || document.body.classList.contains('pseudo-fullscreen');
+          if (!isFull) {
+            if (root.requestFullscreen) {
+              root.requestFullscreen().catch(() => {
+                document.body.classList.add('pseudo-fullscreen');
+              });
+            } else if (root.webkitRequestFullscreen) {
+              root.webkitRequestFullscreen();
+            } else {
+              document.body.classList.add('pseudo-fullscreen');
+            }
+            document.getElementById('textFullscreen').textContent = 'Thoát toàn màn hình';
+          } else {
+            if (document.exitFullscreen && document.fullscreenElement) {
+              document.exitFullscreen().catch(() => {});
+            } else if (document.webkitExitFullscreen && document.webkitFullscreenElement) {
+              document.webkitExitFullscreen();
+            }
+            document.body.classList.remove('pseudo-fullscreen');
+            document.getElementById('textFullscreen').textContent = 'Toàn màn hình';
+          }
+          setTimeout(resizeCanvas, 150);
+        });
+
+        window.addEventListener('resize', resizeCanvas);
+      }
+
+      // Main Animation Loop
+      let lastTime = performance.now();
+      function loop(now) {
+        const dt = Math.min(0.05, Math.max(0.001, (now - lastTime) / 1000));
+        lastTime = now;
+        updateGame(dt);
+        drawScene();
+        requestAnimationFrame(loop);
+      }
+
+      window.onload = function () {
+        preloadRealAudio();
+        loadStateFromStorage();
+        initCloudsAndBirds();
+        resizeCanvas();
+        rebuildSchoolyardEntities();
+        renderCalledHistoryList();
+        bindEvents();
+        updateAudioStatusUI();
+        lastTime = performance.now();
+        requestAnimationFrame(loop);
+      };
+    })();
+  </script>
+</body>
+</html>
