@@ -114,6 +114,9 @@
     <header class="relative z-20 flex flex-wrap items-center justify-between gap-2 px-3 py-2 sm:px-5 sm:py-2.5 bg-white/90 backdrop-blur-md border-b-4 border-sky-300 shadow-sm">
       <!-- Game Title & Alien Badge -->
       <div class="flex items-center gap-2.5">
+        <!-- Studio Logo: Bảo Alone -->
+        <img src="assets/bao-alone-mark.png" alt="Bảo Alone Studio" title="Bảo Alone · Creative Studio · Game Studio" class="h-10 sm:h-11 w-auto shrink-0 select-none" draggable="false" />
+        <span class="hidden sm:block w-px h-9 bg-slate-200"></span>
         <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-gradient-to-br from-violet-500 via-fuchsia-500 to-amber-400 flex items-center justify-center shadow-md border-2 border-white animate-float" title="UFO Tinh Nghịch">
           <span class="text-xl sm:text-2xl" role="img" aria-label="UFO">🛸</span>
         </div>
@@ -122,7 +125,7 @@
             <h1 class="font-display font-extrabold text-lg sm:text-2xl text-slate-800 tracking-tight leading-none">
               UFO ơi! <span class="text-rose-500">Đừng bắt em!</span>
             </h1>
-            <span id="statusBadge" class="hidden md:inline-flex items-center gap-1 px-2.5 py-0.5 text-xs font-extrabold rounded-full bg-emerald-100 text-emerald-700 border border-emerald-300">
+            <span id="statusBadge" class="hidden min-[1760px]:inline-flex items-center gap-1 px-2.5 py-0.5 text-xs font-extrabold rounded-full bg-emerald-100 text-emerald-700 border border-emerald-300">
               <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
               Sân trường vui nhộn
             </span>
@@ -181,7 +184,7 @@
         <!-- Fullscreen Toggle -->
         <button id="btnFullscreen" type="button" class="btn-cartoon px-2.5 py-1.5 rounded-2xl bg-slate-800 hover:bg-slate-700 text-white font-extrabold text-xs sm:text-sm flex items-center gap-1 border-2 border-slate-950" title="Toàn màn hình để chiếu trên lớp">
           <span id="iconFullscreen">⛶</span>
-          <span class="hidden lg:inline" id="textFullscreen">Toàn màn hình</span>
+          <span class="hidden min-[1760px]:inline" id="textFullscreen">Toàn màn hình</span>
         </button>
       </div>
     </header>
@@ -237,6 +240,11 @@
         </div>
 
         <!-- BOTTOM CENTER MAIN TEACHER CTA BUTTON -->
+        <!-- Studio Credit: Bảo Alone (bottom-left corner of the stage) -->
+        <div class="pointer-events-none absolute bottom-3 left-3 z-10 hidden md:block bg-white/85 backdrop-blur-sm rounded-2xl border-2 border-white shadow-md px-2.5 py-1.5">
+          <img src="assets/bao-alone-logo.png" alt="Bảo Alone · Creative Studio · Game Studio" class="h-14 lg:h-16 w-auto select-none" draggable="false" />
+        </div>
+
         <div class="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2 w-full max-w-lg px-4 pointer-events-none">
           <div class="flex items-center gap-2 pointer-events-auto">
             <button id="btnTriggerCatch" type="button" class="btn-cartoon btn-cta-pulse px-6 sm:px-8 py-3 sm:py-4 rounded-3xl bg-gradient-to-b from-amber-300 via-orange-400 to-rose-500 hover:from-amber-200 hover:to-rose-400 text-white font-display font-extrabold text-lg sm:text-2xl tracking-wide border-4 border-white shadow-xl flex items-center gap-3" title="Bấm nút hoặc nhấn phím SPACE để UFO bắt 1 bạn">
